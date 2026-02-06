@@ -18,17 +18,28 @@ def create_admin():
     print("Admin Account Creation")
     print("=" * 50)
     
-    email = input("Enter admin email: ").strip()
-    if not email:
-        print("Error: Email is required")
-        return
+    # Check if default admin should be created
+    create_default = input("Create default admin? (y/n): ").strip().lower()
     
-    password = input("Enter admin password: ").strip()
-    if not password:
-        print("Error: Password is required")
-        return
-    
-    name = input("Enter admin name (optional): ").strip()
+    if create_default == 'y':
+        email = "admin@virtualcareercounselor.com"
+        password = "admin123"
+        name = "System Administrator"
+        print(f"\nCreating default admin with:")
+        print(f"Email: {email}")
+        print(f"Password: {password}")
+    else:
+        email = input("Enter admin email: ").strip()
+        if not email:
+            print("Error: Email is required")
+            return
+        
+        password = input("Enter admin password: ").strip()
+        if not password:
+            print("Error: Password is required")
+            return
+        
+        name = input("Enter admin name (optional): ").strip()
     
     # Check if admin already exists
     existing = aws.get_admin_by_email(email)
