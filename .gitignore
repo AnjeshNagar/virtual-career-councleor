@@ -1,0 +1,41 @@
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+
+# Testing files
+test_*.py
+test_*.html
+test_*.sh
+test_*.bat
+app_local.py
+
+# Temporary documentation
+TESTING_GUIDE.md
+BEDROCK_*.md
+ROADMAP_*.md
+netstat.txt
