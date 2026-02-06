@@ -1391,7 +1391,7 @@ Make it practical and tailored to actually becoming a {goal}, not generic career
                     return "For data analysis, master SQL for data querying, Python (pandas, NumPy) or R for analysis, Excel for basic analytics, visualization tools (Tableau, Power BI), and statistical concepts. Practice with real datasets and build a portfolio."
         
         # Default helpful response
-        return f"I'm your virtual career counselor! I can help with career planning, skill development, resume tips, interview prep, and creating personalized learning roadmaps. {'Since you\'re interested in ' + user_role + ', ' if user_role else ''}Try asking me specific questions like: 'How do I become a [profession]?', 'What skills do I need?', 'Help me with my resume', or 'Prepare me for interviews'. I can also generate a detailed roadmap for your career goals!"
+        return f"I'm your virtual career counselor! I can help with career planning, skill development, resume tips, interview prep, and creating personalized learning roadmaps. Since you're interested in {user_role} if user_role else 'Try asking me specific questions like: 'How do I become a [profession]?', 'What skills do I need?', 'Help me with my resume', or 'Prepare me for interviews'. I can also generate a detailed roadmap for your career goals!"
 
     # Career Path Exploration - Comprehensive career information
     def explore_career_path(self, career_name, user_id=None):
@@ -2952,4 +2952,5 @@ Guidelines:
                 self._write_store(store)
                 return True
         
+
         return False
