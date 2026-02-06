@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Course Recommendations - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="/static/navbar.js" defer></script>
+  </head>
+  <body class="homepage-body">
+    <div class="homepage-bg-animation">
+      <div class="bg-orb orb-1"></div>
+      <div class="bg-orb orb-2"></div>
+      <div class="bg-orb orb-3"></div>
+      <div class="bg-orb orb-4"></div>
+    </div>
+
+    <header class="topbar enhanced-topbar">
+      <div class="brand">
+        <div class="logo-wrapper">
+          <img src="/static/images/logo.svg" alt="logo" class="logo" />
+        </div>
+        <h1>Virtual Career Counselor</h1>
+      </div>
+      
+      <!-- Mobile Menu Toggle -->
+      <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="nav" id="mainNav">
+        <a class="nav-link" href="/">🏠 Home</a>
+        <a class="nav-link" href="/dashboard">📊 Dashboard</a>
+        
+        <!-- Career Development Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">🚀 Career</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/career-explore">🔍 Explore Careers</a>
+            <a class="dropdown-item" href="/career-match">🎯 Career Match</a>
+            <a class="dropdown-item" href="/learning-paths">📚 Learning Paths</a>
+            <a class="dropdown-item" href="/analytics">📊 Career Analytics</a>
+          </div>
+        </div>
+
+        <!-- Learning & Skills Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">📚 Learning</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/courses">📖 Courses</a>
+            <a class="dropdown-item" href="/resume-builder">📄 Resume Builder</a>
+            <a class="dropdown-item" href="/interview-prep">🎤 Interview Prep</a>
+            <a class="dropdown-item" href="/salary-negotiation">💰 Salary Negotiation</a>
+          </div>
+        </div>
+
+        <!-- Jobs & Network Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">💼 Jobs</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/job-insights">🔍 Job Insights</a>
+            <a class="dropdown-item" href="/saved-jobs">🔖 Saved Jobs</a>
+            <a class="dropdown-item" href="/company-insights">🏢 Companies</a>
+            <a class="dropdown-item" href="/referrals">🤝 Referrals</a>
+          </div>
+        </div>
+
+        <!-- Community Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">👥 Community</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/mentors">👨‍🏫 Mentors</a>
+            <a class="dropdown-item" href="/forum">💬 Forum</a>
+            <a class="dropdown-item" href="/connections">🤝 Connections</a>
+            <a class="dropdown-item" href="/leaderboard">🏆 Leaderboard</a>
+          </div>
+        </div>
+
+        <!-- Profile & Settings -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">👤 Account</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/profile">👤 Profile</a>
+            <a class="dropdown-item" href="/settings">⚙️ Settings</a>
+            <a class="dropdown-item" href="/logout">🚪 Logout</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <div class="container homepage-container">
+      <section class="card enhanced-card">
+        <div class="section-header">
+          <div class="section-icon">📚</div>
+          <h2 class="section-title">Personalized Course Recommendations</h2>
+          <p class="section-subtitle">Get AI-powered course recommendations tailored to your career goals</p>
+        </div>
+
+        <div class="preferences-form">
+          <div class="form-group-enhanced">
+            <label class="form-label-enhanced">
+              <span class="label-icon">💼</span>
+              <span class="label-text">Career/Profession (Optional - Leave empty to use your profile career)</span>
+            </label>
+            <input id="careerInput" type="text" class="form-input-enhanced" placeholder="e.g., CA, Teacher, Software Engineer, Data Analyst" />
+          </div>
+          <div class="form-group-enhanced">
+            <label class="form-label-enhanced">
+              <span class="label-icon">🎯</span>
+              <span class="label-text">Learning Preferences (Optional)</span>
+            </label>
+            <textarea id="preferencesInput" class="form-input-enhanced" rows="3" placeholder="e.g., I prefer online courses, beginner-friendly, focus on practical projects..."></textarea>
+          </div>
+          <button id="getCoursesBtn" class="generate-button-enhanced">
+            <span class="button-icon">✨</span>
+            <span class="button-text">Get Course Recommendations</span>
+            <span class="button-arrow">→</span>
+          </button>
+        </div>
+
+        <div id="coursesResults" class="courses-results-container" style="display:none">
+          <!-- Results will be populated here -->
+        </div>
+      </section>
+    </div>
+
+    <script>
+      // Auto-load recommendations on page load
+      window.addEventListener('DOMContentLoaded', async () => {
+        await loadRecommendations();
+      });
+
+      document.getElementById('getCoursesBtn').addEventListener('click', async () => {
+        await loadRecommendations();
+      });
+
+      async function loadRecommendations() {
+        const preferencesText = document.getElementById('preferencesInput').value.trim();
+        const careerName = document.getElementById('careerInput').value.trim();
+        const preferences = preferencesText ? {notes: preferencesText} : {};
+        const payload = {preferences};
+        if (careerName) {
+          payload.career = careerName;
+        }
+
+        const btn = document.getElementById('getCoursesBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="button-icon">⏳</span><span class="button-text">Loading...</span>';
+
+        try {
+          const res = await fetch('/api/course-recommendations', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+          });
+
+          const data = await res.json();
+          if (res.ok && data.recommendations) {
+            displayCourseRecommendations(data.recommendations);
+          } else {
+            alert('Error: ' + (data.error || 'Failed to fetch recommendations'));
+          }
+        } catch (error) {
+          alert('Error: ' + error.message);
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<span class="button-icon">✨</span><span class="button-text">Get Recommendations</span><span class="button-arrow">→</span>';
+        }
+      }
+
+      function displayCourseRecommendations(data) {
+        const container = document.getElementById('coursesResults');
+        container.style.display = 'block';
+
+        const recommendations = data.recommendations || [];
+        const summary = data.summary || '';
+
+        container.innerHTML = `
+          ${summary ? `<div class="recommendations-summary"><p>${summary}</p></div>` : ''}
+          <div class="recommendations-grid">
+            ${recommendations.map((course, idx) => `
+              <div class="recommendation-card">
+                <div class="recommendation-header">
+                  <div class="course-number">#${idx + 1}</div>
+                  <h3>${course.course_name || 'Course Name'}</h3>
+                </div>
+                <p class="course-description">${course.description || ''}</p>
+                <div class="course-details">
+                  <div class="detail-row">
+                    <span class="detail-label">Platform:</span>
+                    <span class="detail-value">${course.platform || 'N/A'}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">Duration:</span>
+                    <span class="detail-value">${course.duration || 'N/A'}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">Level:</span>
+                    <span class="detail-value">${course.level || 'N/A'}</span>
+                  </div>
+                  ${course.rating ? `
+                    <div class="detail-row">
+                      <span class="detail-label">Rating:</span>
+                      <span class="detail-value">${course.rating}</span>
+                    </div>
+                  ` : ''}
+                  <div class="detail-row">
+                    <span class="detail-label">Price:</span>
+                    <span class="detail-value">${course.price || 'N/A'}</span>
+                  </div>
+                </div>
+                ${course.why_recommended ? `
+                  <div class="why-recommended">
+                    <strong>Why Recommended:</strong>
+                    <p>${course.why_recommended}</p>
+                  </div>
+                ` : ''}
+                ${course.skills_covered && course.skills_covered.length > 0 ? `
+                  <div class="skills-covered">
+                    <strong>Skills Covered:</strong>
+                    <div class="skills-tags">
+                      ${course.skills_covered.map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+                    </div>
+                  </div>
+                ` : ''}
+              </div>
+            `).join('')}
+          </div>
+        `;
+
+        container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Login - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body class="homepage-body">
+    <div class="homepage-bg-animation">
+      <div class="bg-orb orb-1"></div>
+      <div class="bg-orb orb-2"></div>
+      <div class="bg-orb orb-3"></div>
+      <div class="bg-orb orb-4"></div>
+    </div>
+
+    <div class="container homepage-container" style="max-width: 500px; margin-top: 5rem;">
+      <section class="card enhanced-card">
+        <div class="section-header">
+          <div class="section-icon">🔐</div>
+          <h2 class="section-title">Admin Login</h2>
+          <p class="section-subtitle">Access the admin dashboard</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}" style="margin-bottom: 1rem; padding: 1rem; border-radius: 8px; background: {% if category == 'error' %}rgba(255, 0, 0, 0.1){% else %}rgba(0, 255, 0, 0.1){% endif %};">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/admin/login">
+          <div class="form-group-enhanced">
+            <label class="form-label-enhanced">
+              <span class="label-icon">📧</span>
+              <span class="label-text">Email</span>
+            </label>
+            <input type="email" name="email" class="form-input-enhanced" required placeholder="admin@example.com" />
+          </div>
+
+          <div class="form-group-enhanced">
+            <label class="form-label-enhanced">
+              <span class="label-icon">🔒</span>
+              <span class="label-text">Password</span>
+            </label>
+            <input type="password" name="password" class="form-input-enhanced" required placeholder="Enter your password" />
+          </div>
+
+          <button type="submit" class="generate-button-enhanced" style="width: 100%; margin-top: 1rem;">
+            <span class="button-icon">🚀</span>
+            <span class="button-text">Login</span>
+          </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 1rem;">
+          <a href="/login" class="btn-soft">Back to User Login</a>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

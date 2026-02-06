@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Find Mentors - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="/static/dark-mode.js" defer></script>
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <img src="/static/images/logo.svg" alt="logo" class="logo" />
+            <h1>Virtual Career Counselor</h1>
+        </div>
+        <nav class="nav">
+            <a class="btn-soft" href="/">🏠 Home</a>
+            <a class="btn-soft" href="/dashboard">📊 Dashboard</a>
+            <a class="btn-soft" href="/career-explore">🔍 Explore</a>
+            <a class="btn-soft" href="/courses">📚 Courses</a>
+            <a class="btn-soft" href="/job-insights">💼 Jobs</a>
+            <a class="btn-soft" href="/profile">👤 Profile</a>
+            <a class="btn-soft" href="/resume-builder">📄 Resume</a>
+            <a class="btn-soft" href="/interview-prep">🎤 Interview</a>
+            <a class="btn-soft" href="/career-match">🎯 Match</a>
+            <a class="btn-soft" href="/analytics">📊 Analytics</a>
+            <a class="btn-soft" href="/saved-jobs">🔖 Saved</a>
+            <a class="btn-soft" href="/settings">⚙️ Settings</a>
+            <details class="nav-more">
+                <summary class="btn-soft">✨ More</summary>
+                <div class="nav-more-menu">
+                    <a class="btn-soft" href="/salary-negotiation">💰 Salary</a>
+                    <a class="btn-soft" href="/company-insights">🏢 Companies</a>
+                    <a class="btn-soft" href="/mentors">👥 Mentors</a>
+                    <a class="btn-soft" href="/forum">💬 Forum</a>
+                    <a class="btn-soft" href="/learning-paths">📚 Paths</a>
+                    <a class="btn-soft" href="/referrals">🤝 Refer</a>
+                    <a class="btn-soft" href="/connections">🤝 Connections</a>
+                    <a class="btn-soft" href="/leaderboard">🏆 Leaderboard</a>
+                </div>
+            </details>
+            <a class="btn-soft" href="/logout">🚪 Logout</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>👥 Find Mentors</h2>
+            <p>Connect with experienced professionals in your field</p>
+
+            <div class="search-section">
+                <input type="text" id="careerSearch" class="form-input-enhanced" placeholder="Search by career field (optional)" />
+                <button class="btn-soft" id="searchMentors">🔍 Find Mentors</button>
+            </div>
+
+            <div id="mentorsList" class="mentors-list"></div>
+        </div>
+    </div>
+
+    <script>
+        async function loadMentors() {
+            const career = document.getElementById('careerSearch').value.trim();
+            const url = career ? `/api/mentors?career=${encodeURIComponent(career)}` : '/api/mentors';
+            
+            const res = await fetch(url);
+            if (res.ok) {
+                const data = await res.json();
+                const mentors = data.mentors || [];
+                const container = document.getElementById('mentorsList');
+                
+                if (mentors.length === 0) {
+                    container.innerHTML = '<p class="muted">No mentors found. Try a different search term or check back later!</p>';
+                } else {
+                    container.innerHTML = mentors.map(m => {
+                        const user = m.user || {};
+                        const profile = user.profile || {};
+                        return `
+                            <div class="mentor-card">
+                                <div class="mentor-header">
+                                    <h3>${profile.fullName || profile.name || 'Mentor'}</h3>
+                                    <div class="match-score">Match Score: ${m.matchScore || 0}</div>
+                                </div>
+                                <div class="mentor-details">
+                                    <p><strong>Current Role:</strong> ${profile.currentRole || 'Not specified'}</p>
+                                    <p><strong>Target Role:</strong> ${profile.targetRole || 'Not specified'}</p>
+                                    <p><strong>Experience:</strong> ${m.completedActivities || 0} completed activities</p>
+                                </div>
+                                <div class="mentor-actions">
+                                    <button class="btn-soft" onclick="sendConnectionRequest('${user.userId}', '${profile.fullName || 'Mentor'}')">
+                                        🤝 Connect
+                                    </button>
+                                    <a href="/profile/${user.publicProfileId || user.userId}" class="btn-soft" target="_blank">
+                                        👤 View Profile
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+        }
+
+        window.sendConnectionRequest = async (userId, name) => {
+            const message = prompt(`Send a connection request to ${name} (optional message):`);
+            const res = await fetch('/api/connections/request', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({toUserId: userId, message: message || null})
+            });
+
+            if (res.ok) {
+                alert('Connection request sent!');
+            } else {
+                alert('Failed to send request');
+            }
+        };
+
+        document.getElementById('searchMentors').addEventListener('click', loadMentors);
+        loadMentors(); // Load on page load
+    </script>
+</body>
+</html>

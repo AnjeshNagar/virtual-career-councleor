@@ -1,0 +1,346 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="/static/navbar.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar enhanced-topbar">
+      <div class="brand">
+        <div class="logo-wrapper">
+          <img src="/static/images/logo.svg" alt="logo" class="logo" />
+        </div>
+        <h1>Virtual Career Counselor</h1>
+      </div>
+      
+      <!-- Mobile Menu Toggle -->
+      <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="nav" id="mainNav">
+        <a class="nav-link" href="/">🏠 Home</a>
+        <a class="nav-link" href="/dashboard">📊 Dashboard</a>
+        
+        <!-- Career Development Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">🚀 Career</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/career-explore">🔍 Explore Careers</a>
+            <a class="dropdown-item" href="/career-match">🎯 Career Match</a>
+            <a class="dropdown-item" href="/learning-paths">📚 Learning Paths</a>
+            <a class="dropdown-item" href="/analytics">📊 Career Analytics</a>
+          </div>
+        </div>
+
+        <!-- Learning & Skills Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">📚 Learning</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/courses">📖 Courses</a>
+            <a class="dropdown-item" href="/resume-builder">📄 Resume Builder</a>
+            <a class="dropdown-item" href="/interview-prep">🎤 Interview Prep</a>
+            <a class="dropdown-item" href="/salary-negotiation">💰 Salary Negotiation</a>
+          </div>
+        </div>
+
+        <!-- Jobs & Network Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">💼 Jobs</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/job-insights">🔍 Job Insights</a>
+            <a class="dropdown-item" href="/saved-jobs">🔖 Saved Jobs</a>
+            <a class="dropdown-item" href="/company-insights">🏢 Companies</a>
+            <a class="dropdown-item" href="/referrals">🤝 Referrals</a>
+          </div>
+        </div>
+
+        <!-- Community Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">👥 Community</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/mentors">👨‍🏫 Mentors</a>
+            <a class="dropdown-item" href="/forum">💬 Forum</a>
+            <a class="dropdown-item" href="/connections">🤝 Connections</a>
+            <a class="dropdown-item" href="/leaderboard">🏆 Leaderboard</a>
+          </div>
+        </div>
+
+        <!-- Profile & Settings -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">👤 Account</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/profile">👤 Profile</a>
+            <a class="dropdown-item" href="/settings">⚙️ Settings</a>
+            <a class="dropdown-item" href="/logout">🚪 Logout</a>
+          </div>
+        </div>
+        
+        <div class="notification-bell" id="notificationBell">
+          🔔
+          <span class="notification-badge" id="notificationBadge" style="display:none">{{ unreadNotifications or 0 }}</span>
+        </div>
+      </nav>
+    </header>
+    <div class="container">
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-messages">
+            {% for category, message in messages %}
+              <div class="flash-message flash-{{ category }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      
+      <div class="dash-hero card">
+        <div class="dash-left">
+          <h2>Hello, <span id="display-name">{% if user and user.profile and (user.profile.fullName or user.profile.name) %}{{ user.profile.fullName or user.profile.name }}{% else %}{{ user.email }}{% endif %}</span> 🎯</h2>
+          <p class="muted">Here's your personalized progress and recommendations. Keep going! ✨</p>
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-value" id="stat-roadmaps">{{ roadmaps|length }}</div>
+              <div class="stat-label">Roadmaps</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value" id="stat-activities">{{ activities|selectattr('status','equalto','completed')|list|length }}</div>
+              <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">🏆</div>
+              <div class="stat-label">Milestones</div>
+            </div>
+          </div>
+        </div>
+        <div class="dash-right">
+          <div class="wave-anim">🚀</div>
+        </div>
+        <div style="margin-top:12px">
+          <div class="muted">Progress toward completing suggested activities</div>
+          <div class="progress-wrap"><div id="progressBar" class="progress-bar"></div></div>
+          <div style="margin-top:8px">
+            <a href="/leaderboard" class="btn-soft">View Leaderboard</a>
+            <a href="/analytics" class="btn-soft">📊 Analytics</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gamification Stats -->
+      <section class="card" id="gamification-section">
+        <h2>🏆 Your Progress</h2>
+        <div id="gamification-stats" class="gamification-stats">
+          <div class="gamification-item">
+            <div class="gamification-icon">⭐</div>
+            <div>
+              <div class="gamification-value" id="gamification-level">Level 1</div>
+              <div class="gamification-label">Current Level</div>
+            </div>
+          </div>
+          <div class="gamification-item">
+            <div class="gamification-icon">💎</div>
+            <div>
+              <div class="gamification-value" id="gamification-xp">0 XP</div>
+              <div class="gamification-label">Total Experience</div>
+            </div>
+          </div>
+          <div class="gamification-item">
+            <div class="gamification-icon">🔥</div>
+            <div>
+              <div class="gamification-value" id="gamification-streak">0 days</div>
+              <div class="gamification-label">Login Streak</div>
+            </div>
+          </div>
+          <div class="gamification-item">
+            <div class="gamification-icon">🏅</div>
+            <div>
+              <div class="gamification-value" id="gamification-badges">0 badges</div>
+              <div class="gamification-label">Badges Earned</div>
+            </div>
+          </div>
+        </div>
+        <div id="badges-display" class="badges-display"></div>
+      </section>
+
+      <!-- Notifications Panel -->
+      <div id="notificationsPanel" class="notifications-panel" style="display:none">
+        <div class="notifications-header">
+          <h3>Notifications</h3>
+          <button class="btn-soft" id="markAllRead">Mark All Read</button>
+          <button class="btn-soft" onclick="document.getElementById('notificationsPanel').style.display='none'">✕</button>
+        </div>
+        <div id="notificationsList" class="notifications-list"></div>
+      </div>
+      </div>
+
+      <section class="card" id="roadmaps-section">
+        <h2>Your Roadmaps</h2>
+        <div id="roadmaps-list">
+          {% if roadmaps %}
+            <ul>
+              {% for r in roadmaps %}
+                <li><a href="/roadmap/{{ r.roadmapId }}">{{ r.goal }}</a> — generated {{ r.generatedAt }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>No roadmaps yet.</p>
+          {% endif %}
+        </div>
+      </section>
+
+      <section class="card" id="activity-section">
+        <h2>Completed Quizzes & Activities</h2>
+        <div id="activities-list">
+          {% set completed = activities|selectattr('status','equalto','completed')|list %}
+          {% if completed %}
+            <ul>
+              {% for a in completed[:10] %}
+                <li class="activity-row"><strong>{{ a.title or a.activityId }}</strong> — {{ a.level|title }} — Score: {{ a.lastScore or 'N/A' }}%</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>No completed activities yet.</p>
+          {% endif %}
+        </div>
+      </section>
+
+      <p><a href="/logout">Logout</a></p>
+    </div>
+
+    <script>
+    // Polling for live updates
+    async function fetchDashboard(){
+      try{
+        const res = await fetch('/api/dashboard-data');
+        if(!res.ok) return;
+        const j = await res.json();
+        const user = j.user || {};
+        document.getElementById('display-name').textContent = (user.profile && user.profile.fullName) ? user.profile.fullName : (user.email || 'User');
+        const roadmaps = j.roadmaps || [];
+        const activities = j.activities || [];
+        document.getElementById('stat-roadmaps').textContent = roadmaps.length;
+        // compute completed activities
+        const completed = activities.filter(a=>a.status==='completed');
+        document.getElementById('stat-activities').textContent = completed.length;
+        // progress percent = completed / total suggested
+        const percent = Math.round((completed.length / Math.max(1, activities.length)) * 100);
+        document.getElementById('progressBar').style.width = percent + '%';
+        // update lists
+        const rlist = document.getElementById('roadmaps-list');
+        if(roadmaps.length){
+          rlist.innerHTML = '<ul>' + roadmaps.map(r=>`<li><a href="/roadmap/${r.roadmapId}">${r.goal}</a> — generated ${r.generatedAt}</li>`).join('') + '</ul>';
+        } else { rlist.innerHTML = '<p>No roadmaps yet.</p>'; }
+        const alist = document.getElementById('activities-list');
+        // Show only completed activities with their scores
+        const completedActivities = activities.filter(a => a.status === 'completed');
+        if(completedActivities.length){
+          alist.innerHTML = '<ul>' + completedActivities.slice(0,10).map(a=>`<li class="activity-row"><strong>${a.title || 'Quiz'}</strong> — ${a.level || 'N/A'} — Score: ${a.lastScore || 'N/A'}%</li>`).join('') + '</ul>';
+        } else { alist.innerHTML = '<p>No completed activities yet.</p>'; }
+      }catch(e){console.warn('dashboard fetch failed',e)}
+    }
+
+    // Load gamification stats
+    async function loadGamification(){
+      try{
+        const res = await fetch('/api/gamification');
+        if(res.ok){
+          const data = await res.json();
+          const stats = data.stats || {};
+          document.getElementById('gamification-level').textContent = `Level ${stats.level || 1}`;
+          document.getElementById('gamification-xp').textContent = `${stats.xp || 0} XP`;
+          document.getElementById('gamification-streak').textContent = `${stats.streak || 0} days 🔥`;
+          document.getElementById('gamification-badges').textContent = `${(stats.badges || []).length} badges`;
+          
+          // Display badges
+          const badgesContainer = document.getElementById('badges-display');
+          if(stats.badges && stats.badges.length > 0){
+            badgesContainer.innerHTML = '<h4>Your Badges:</h4><div class="badges-grid">' + 
+              stats.badges.map(b => `<div class="badge-item" title="${b.description}">${b.icon} ${b.name}</div>`).join('') + 
+              '</div>';
+          } else {
+            badgesContainer.innerHTML = '<p class="muted">Complete activities to earn badges!</p>';
+          }
+        }
+      }catch(e){console.warn('gamification fetch failed',e)}
+    }
+
+    // Load notifications
+    async function loadNotifications(){
+      try{
+        const res = await fetch('/api/notifications?unread_only=true');
+        if(res.ok){
+          const data = await res.json();
+          const unreadCount = data.unreadCount || 0;
+          const badge = document.getElementById('notificationBadge');
+          if(unreadCount > 0){
+            badge.textContent = unreadCount;
+            badge.style.display = 'inline-block';
+          } else {
+            badge.style.display = 'none';
+          }
+        }
+      }catch(e){console.warn('notifications fetch failed',e)}
+    }
+
+    // Show notifications panel
+    document.getElementById('notificationBell').addEventListener('click', async () => {
+      const panel = document.getElementById('notificationsPanel');
+      if(panel.style.display === 'none'){
+        panel.style.display = 'block';
+        const res = await fetch('/api/notifications');
+        if(res.ok){
+          const data = await res.json();
+          const notifications = data.notifications || [];
+          const list = document.getElementById('notificationsList');
+          if(notifications.length === 0){
+            list.innerHTML = '<p class="muted">No notifications</p>';
+          } else {
+            list.innerHTML = notifications.map(n => `
+              <div class="notification-item ${n.read ? '' : 'unread'}" onclick="markNotificationRead('${n.notificationId}')">
+                <div class="notification-icon">${n.type === 'achievement' ? '🏆' : n.type === 'application_update' ? '📝' : '🔔'}</div>
+                <div class="notification-content">
+                  <strong>${n.title}</strong>
+                  <p>${n.message}</p>
+                  <small>${new Date(n.createdAt).toLocaleString()}</small>
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+      } else {
+        panel.style.display = 'none';
+      }
+    });
+
+    window.markNotificationRead = async (notificationId) => {
+      await fetch(`/api/notifications/${notificationId}/read`, {method: 'POST'});
+      loadNotifications();
+      document.getElementById('notificationsPanel').style.display = 'none';
+      loadNotifications();
+    };
+
+    document.getElementById('markAllRead').addEventListener('click', async () => {
+      await fetch('/api/notifications/read-all', {method: 'POST'});
+      loadNotifications();
+      document.getElementById('notificationsPanel').style.display = 'none';
+    });
+
+    // Update streak on page load
+    fetch('/api/gamification/update-streak', {method: 'POST'});
+
+    fetchDashboard();
+    loadGamification();
+    loadNotifications();
+    setInterval(fetchDashboard, 5000);
+    setInterval(loadGamification, 10000);
+    setInterval(loadNotifications, 30000);
+    </script>
+  </body>
+</html>

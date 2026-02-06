@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Job Market Insights - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="/static/navbar.js" defer></script>
+  </head>
+  <body class="homepage-body">
+    <div class="homepage-bg-animation">
+      <div class="bg-orb orb-1"></div>
+      <div class="bg-orb orb-2"></div>
+      <div class="bg-orb orb-3"></div>
+      <div class="bg-orb orb-4"></div>
+    </div>
+
+    <header class="topbar enhanced-topbar">
+      <div class="brand">
+        <div class="logo-wrapper">
+          <img src="/static/images/logo.svg" alt="logo" class="logo" />
+        </div>
+        <h1>Virtual Career Counselor</h1>
+      </div>
+      
+      <!-- Mobile Menu Toggle -->
+      <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="nav" id="mainNav">
+        <a class="nav-link" href="/">🏠 Home</a>
+        <a class="nav-link" href="/dashboard">📊 Dashboard</a>
+        
+        <!-- Career Development Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">🚀 Career</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/career-explore">🔍 Explore Careers</a>
+            <a class="dropdown-item" href="/career-match">🎯 Career Match</a>
+            <a class="dropdown-item" href="/learning-paths">📚 Learning Paths</a>
+            <a class="dropdown-item" href="/analytics">📊 Career Analytics</a>
+          </div>
+        </div>
+
+        <!-- Learning & Skills Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">📚 Learning</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/courses">📖 Courses</a>
+            <a class="dropdown-item" href="/resume-builder">📄 Resume Builder</a>
+            <a class="dropdown-item" href="/interview-prep">🎤 Interview Prep</a>
+            <a class="dropdown-item" href="/salary-negotiation">💰 Salary Negotiation</a>
+          </div>
+        </div>
+
+        <!-- Jobs & Network Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">💼 Jobs</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/job-insights">🔍 Job Insights</a>
+            <a class="dropdown-item" href="/saved-jobs">🔖 Saved Jobs</a>
+            <a class="dropdown-item" href="/company-insights">🏢 Companies</a>
+            <a class="dropdown-item" href="/referrals">🤝 Referrals</a>
+          </div>
+        </div>
+
+        <!-- Community Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">👥 Community</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/mentors">👨‍🏫 Mentors</a>
+            <a class="dropdown-item" href="/forum">💬 Forum</a>
+            <a class="dropdown-item" href="/connections">🤝 Connections</a>
+            <a class="dropdown-item" href="/leaderboard">🏆 Leaderboard</a>
+          </div>
+        </div>
+
+        <!-- Profile & Settings -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">👤 Account</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/profile">👤 Profile</a>
+            <a class="dropdown-item" href="/settings">⚙️ Settings</a>
+            <a class="dropdown-item" href="/logout">🚪 Logout</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <div class="container homepage-container">
+      <section class="card enhanced-card">
+        <div class="section-header">
+          <div class="section-icon">💼</div>
+          <h2 class="section-title">Job Market Insights</h2>
+          <p class="section-subtitle">Get real-time insights into job market trends, salaries, and opportunities</p>
+        </div>
+
+        <div class="insights-search-wrapper">
+          <div class="form-row">
+            <div class="form-group-enhanced">
+              <label class="form-label-enhanced">
+                <span class="label-icon">💼</span>
+                <span class="label-text">Career/Profession</span>
+              </label>
+              <input id="careerInput" type="text" class="form-input-enhanced" placeholder="e.g., Software Engineer, Data Analyst" required />
+            </div>
+            <div class="form-group-enhanced">
+              <label class="form-label-enhanced">
+                <span class="label-icon">🌍</span>
+                <span class="label-text">Region (Optional)</span>
+              </label>
+              <input id="regionInput" type="text" class="form-input-enhanced" placeholder="e.g., New York, CA, USA" />
+            </div>
+          </div>
+          <button id="getInsightsBtn" class="generate-button-enhanced">
+            <span class="button-icon">✨</span>
+            <span class="button-text">Get Market Insights</span>
+            <span class="button-arrow">→</span>
+          </button>
+        </div>
+
+        <div id="insightsResults" class="insights-results-container" style="display:none">
+          <!-- Results will be populated here -->
+        </div>
+
+        <!-- Real Job Listings Section -->
+        <div class="card enhanced-card" style="margin-top: 2rem;">
+          <div class="section-header">
+            <div class="section-icon">💼</div>
+            <h2 class="section-title">Available Job Opportunities</h2>
+            <p class="section-subtitle">Browse real job postings for your career</p>
+          </div>
+
+          <div class="form-group-enhanced" style="margin-bottom: 1rem;">
+            <label class="form-label-enhanced">
+              <span class="label-icon">🔍</span>
+              <span class="label-text">Filter by Career/Profession (Optional)</span>
+            </label>
+            <input id="jobFilterInput" type="text" class="form-input-enhanced" placeholder="e.g., Teacher, CA, Software Engineer" />
+            <button id="filterJobsBtn" class="generate-button-enhanced" style="margin-top: 0.5rem;">
+              <span class="button-icon">🔍</span>
+              <span class="button-text">Filter Jobs</span>
+            </button>
+          </div>
+
+          <div id="jobsList" class="jobs-list-container">
+            <!-- Jobs will be populated here -->
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      document.getElementById('getInsightsBtn').addEventListener('click', async () => {
+        const career = document.getElementById('careerInput').value.trim();
+        if (!career) {
+          alert('Please enter a career name');
+          return;
+        }
+
+        const region = document.getElementById('regionInput').value.trim();
+
+        const btn = document.getElementById('getInsightsBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="button-icon">⏳</span><span class="button-text">Analyzing...</span>';
+
+        try {
+          const res = await fetch('/api/job-insights', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({career, region: region || null})
+          });
+
+          const data = await res.json();
+          if (res.ok && data.insights) {
+            displayInsights(data.insights);
+          } else {
+            alert('Error: ' + (data.error || 'Failed to fetch insights'));
+          }
+        } catch (error) {
+          alert('Error: ' + error.message);
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<span class="button-icon">✨</span><span class="button-text">Get Market Insights</span><span class="button-arrow">→</span>';
+        }
+      });
+
+      function displayInsights(data) {
+        const container = document.getElementById('insightsResults');
+        container.style.display = 'block';
+
+        const trends = data.market_trends || {};
+        const skills = data.in_demand_skills || [];
+        const salary = data.salary_insights || {};
+        const availability = data.job_availability || {};
+        const regions = data.top_regions || [];
+        const outlook = data.future_outlook || '';
+
+        container.innerHTML = `
+          <div class="insights-header">
+            <h3>📊 Market Trends for ${data.career || 'Career'}</h3>
+            <p class="region-info">Region: ${data.region || 'Global'}</p>
+          </div>
+
+          <div class="trends-section">
+            <div class="trend-card">
+              <h4>📈 Demand Level</h4>
+              <div class="trend-value ${(trends.demand_level || '').toLowerCase()}">${trends.demand_level || 'N/A'}</div>
+            </div>
+            <div class="trend-card">
+              <h4>📊 Growth Rate</h4>
+              <div class="trend-value">${trends.growth_rate || 'N/A'}</div>
+            </div>
+            <div class="trend-card full-width">
+              <h4>📝 Trend Description</h4>
+              <p>${trends.trend_description || 'No description available'}</p>
+            </div>
+          </div>
+
+          <div class="insights-section">
+            <h3>🔥 In-Demand Skills</h3>
+            <div class="skills-grid">
+              ${skills.map(skill => `<div class="skill-badge hot">${skill}</div>`).join('')}
+            </div>
+          </div>
+
+          <div class="insights-section">
+            <h3>💰 Salary Insights</h3>
+            <div class="salary-insights-grid">
+              <div class="salary-card">
+                <div class="salary-level">Entry Level</div>
+                <div class="salary-amount">${salary.entry_level || 'N/A'}</div>
+              </div>
+              <div class="salary-card">
+                <div class="salary-level">Mid Level</div>
+                <div class="salary-amount">${salary.mid_level || 'N/A'}</div>
+              </div>
+              <div class="salary-card">
+                <div class="salary-level">Senior Level</div>
+                <div class="salary-amount">${salary.senior_level || 'N/A'}</div>
+              </div>
+            </div>
+            ${salary.factors && salary.factors.length > 0 ? `
+              <div class="salary-factors">
+                <strong>Factors Affecting Salary:</strong>
+                <ul>
+                  ${salary.factors.map(factor => `<li>${factor}</li>`).join('')}
+                </ul>
+              </div>
+            ` : ''}
+          </div>
+
+          <div class="insights-section">
+            <h3>📋 Job Availability</h3>
+            <div class="availability-grid">
+              <div class="availability-card">
+                <h4>Entry Level</h4>
+                <p>${availability.entry_level || 'N/A'}</p>
+              </div>
+              <div class="availability-card">
+                <h4>Mid Level</h4>
+                <p>${availability.mid_level || 'N/A'}</p>
+              </div>
+              <div class="availability-card">
+                <h4>Senior Level</h4>
+                <p>${availability.senior_level || 'N/A'}</p>
+              </div>
+            </div>
+          </div>
+
+          ${regions.length > 0 ? `
+            <div class="insights-section">
+              <h3>🌍 Top Regions</h3>
+              <div class="regions-list">
+                ${regions.map(region => `
+                  <div class="region-card">
+                    <h4>${region.region || 'Region'}</h4>
+                    <div class="region-details">
+                      <span class="region-demand ${(region.demand || '').toLowerCase()}">Demand: ${region.demand || 'N/A'}</span>
+                      <span class="region-salary">Avg Salary: ${region.avg_salary || 'N/A'}</span>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+
+          ${outlook ? `
+            <div class="insights-section">
+              <h3>🔮 Future Outlook</h3>
+              <p class="outlook-text">${outlook}</p>
+            </div>
+          ` : ''}
+        `;
+
+        container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      // Allow Enter key to trigger search
+      document.getElementById('careerInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          document.getElementById('getInsightsBtn').click();
+        }
+      });
+
+      // Load saved jobs status
+      async function loadSavedJobsStatus() {
+        try {
+          const res = await fetch('/api/saved-jobs');
+          if (res.ok) {
+            const data = await res.json();
+            const savedJobIds = (data.jobs || []).map(j => j.jobId);
+            savedJobIds.forEach(jobId => {
+              const btn = document.getElementById(`saveBtn-${jobId}`);
+              const icon = document.getElementById(`saveIcon-${jobId}`);
+              if (btn && icon) {
+                btn.classList.add('saved');
+                icon.textContent = '✅';
+              }
+            });
+          }
+        } catch (e) {
+          console.warn('Failed to load saved jobs status', e);
+        }
+      }
+
+      // Toggle save job
+      window.toggleSaveJob = async (jobId) => {
+        const btn = document.getElementById(`saveBtn-${jobId}`);
+        const icon = document.getElementById(`saveIcon-${jobId}`);
+        const isSaved = btn.classList.contains('saved');
+        
+        try {
+          if (isSaved) {
+            await fetch(`/api/jobs/${jobId}/unsave`, {method: 'POST'});
+            btn.classList.remove('saved');
+            icon.textContent = '🔖';
+          } else {
+            await fetch(`/api/jobs/${jobId}/save`, {method: 'POST'});
+            btn.classList.add('saved');
+            icon.textContent = '✅';
+          }
+        } catch (e) {
+          alert('Failed to update saved jobs');
+        }
+      };
+
+      // Load jobs on page load
+      window.addEventListener('DOMContentLoaded', () => {
+        loadJobs();
+        loadSavedJobsStatus();
+      });
+
+      document.getElementById('filterJobsBtn').addEventListener('click', () => {
+        loadJobs().then(() => loadSavedJobsStatus());
+      });
+
+      async function loadJobs() {
+        const careerFilter = document.getElementById('jobFilterInput').value.trim();
+        const url = careerFilter ? `/api/jobs?career=${encodeURIComponent(careerFilter)}` : '/api/jobs';
+        
+        try {
+          const res = await fetch(url);
+          const data = await res.json();
+          if (res.ok && data.jobs) {
+            displayJobs(data.jobs);
+          } else {
+            document.getElementById('jobsList').innerHTML = '<p>No jobs available at the moment.</p>';
+          }
+        } catch (error) {
+          document.getElementById('jobsList').innerHTML = '<p>Error loading jobs. Please try again.</p>';
+        }
+      }
+
+      async function displayJobs(jobs) {
+        const container = document.getElementById('jobsList');
+        
+        if (jobs.length === 0) {
+          container.innerHTML = '<p style="text-align: center; padding: 2rem;">No jobs found matching your criteria.</p>';
+          return;
+        }
+
+        // Get saved jobs to mark them
+        let savedJobIds = [];
+        try {
+          const savedRes = await fetch('/api/saved-jobs');
+          if (savedRes.ok) {
+            const savedData = await savedRes.json();
+            savedJobIds = (savedData.jobs || []).map(j => j.jobId);
+          }
+        } catch (e) {}
+
+        container.innerHTML = `
+          <div class="jobs-grid">
+            ${jobs.map(job => `
+              <div class="job-card">
+                <div class="job-header">
+                  <h3>${job.title || 'Job Title'}</h3>
+                  <span class="job-company">${job.company || 'Company'}</span>
+                </div>
+                <div class="job-details">
+                  <div class="job-detail-item">
+                    <span class="detail-icon">📍</span>
+                    <span>${job.location || 'Location not specified'}</span>
+                  </div>
+                  <div class="job-detail-item">
+                    <span class="detail-icon">💰</span>
+                    <span>${job.salary_range || 'Salary not specified'}</span>
+                  </div>
+                  <div class="job-detail-item">
+                    <span class="detail-icon">⏰</span>
+                    <span>${job.job_type || 'Full-time'}</span>
+                  </div>
+                  <div class="job-detail-item">
+                    <span class="detail-icon">💼</span>
+                    <span>${job.career_field || 'General'}</span>
+                  </div>
+                  <div class="job-detail-item">
+                    <span class="detail-icon">📊</span>
+                    <span>Experience: ${job.experience_required || 'Not specified'}</span>
+                  </div>
+                </div>
+                <div class="job-description">
+                  <p>${(job.description || '').substring(0, 200)}${job.description && job.description.length > 200 ? '...' : ''}</p>
+                </div>
+                ${job.requirements && job.requirements.length > 0 ? `
+                  <div class="job-requirements">
+                    <strong>Requirements:</strong>
+                    <ul>
+                      ${job.requirements.map(req => `<li>${req}</li>`).join('')}
+                    </ul>
+                  </div>
+                ` : ''}
+                <div class="job-actions">
+                  <button class="apply-job-btn" onclick="showApplicationForm('${job.jobId}', '${job.title}', '${job.company}')">
+                    Apply Now
+                  </button>
+                  <button class="save-job-btn ${savedJobIds.includes(job.jobId) ? 'saved' : ''}" id="saveBtn-${job.jobId}" onclick="toggleSaveJob('${job.jobId}')">
+                    <span id="saveIcon-${job.jobId}">${savedJobIds.includes(job.jobId) ? '✅' : '🔖'}</span> ${savedJobIds.includes(job.jobId) ? 'Saved' : 'Save'}
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      function showApplicationForm(jobId, jobTitle, companyName) {
+        const formHtml = `
+          <div id="applicationModal" class="modal-overlay" onclick="if(event.target.id === 'applicationModal') closeApplicationForm()">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h2>Apply for: ${jobTitle}</h2>
+                <p>Company: ${companyName}</p>
+                <button class="close-btn" onclick="closeApplicationForm()">×</button>
+              </div>
+              <form id="applicationForm" onsubmit="submitApplication(event, '${jobId}')">
+                <div class="form-group-enhanced">
+                  <label class="form-label-enhanced">Full Name *</label>
+                  <input type="text" name="fullName" class="form-input-enhanced" required />
+                </div>
+                <div class="form-group-enhanced">
+                  <label class="form-label-enhanced">Email *</label>
+                  <input type="email" name="email" class="form-input-enhanced" required />
+                </div>
+                <div class="form-group-enhanced">
+                  <label class="form-label-enhanced">Phone *</label>
+                  <input type="tel" name="phone" class="form-input-enhanced" required />
+                </div>
+                <div class="form-group-enhanced">
+                  <label class="form-label-enhanced">Experience *</label>
+                  <textarea name="experience" class="form-input-enhanced" rows="3" required placeholder="Describe your relevant experience"></textarea>
+                </div>
+                <div class="form-group-enhanced">
+                  <label class="form-label-enhanced">Skills (comma-separated) *</label>
+                  <input type="text" name="skills" class="form-input-enhanced" required placeholder="e.g., Python, SQL, Communication" />
+                </div>
+                <div class="form-group-enhanced">
+                  <label class="form-label-enhanced">Education *</label>
+                  <input type="text" name="education" class="form-input-enhanced" required placeholder="e.g., B.Tech Computer Science" />
+                </div>
+                <div class="form-group-enhanced">
+                  <label class="form-label-enhanced">Cover Letter</label>
+                  <textarea name="coverLetter" class="form-input-enhanced" rows="4" placeholder="Why are you interested in this position?"></textarea>
+                </div>
+                <button type="submit" class="generate-button-enhanced">
+                  <span class="button-icon">📤</span>
+                  <span class="button-text">Submit Application</span>
+                </button>
+              </form>
+            </div>
+          </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', formHtml);
+      }
+
+      function closeApplicationForm() {
+        const modal = document.getElementById('applicationModal');
+        if (modal) modal.remove();
+      }
+
+      async function submitApplication(event, jobId) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        
+        const applicationData = {
+          fullName: formData.get('fullName'),
+          email: formData.get('email'),
+          phone: formData.get('phone'),
+          experience: formData.get('experience'),
+          skills: formData.get('skills').split(',').map(s => s.trim()),
+          education: formData.get('education'),
+          coverLetter: formData.get('coverLetter')
+        };
+
+        try {
+          const res = await fetch(`/api/jobs/${jobId}/apply`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(applicationData)
+          });
+
+          const data = await res.json();
+          if (res.ok) {
+            alert('Application submitted successfully! The admin will review your application.');
+            closeApplicationForm();
+            loadJobs(); // Refresh job list
+          } else {
+            alert('Error: ' + (data.error || 'Failed to submit application'));
+          }
+        } catch (error) {
+          alert('Error: ' + error.message);
+        }
+      }
+    </script>
+  </body>
+</html>

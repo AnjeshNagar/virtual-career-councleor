@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Interview Preparation - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <img src="/static/images/logo.svg" alt="logo" class="logo" />
+            <h1>Virtual Career Counselor</h1>
+        </div>
+        <nav class="nav">
+            <a class="btn-soft" href="/">🏠 Home</a>
+            <a class="btn-soft" href="/dashboard">📊 Dashboard</a>
+            <a class="btn-soft" href="/career-explore">🔍 Explore</a>
+            <a class="btn-soft" href="/courses">📚 Courses</a>
+            <a class="btn-soft" href="/job-insights">💼 Jobs</a>
+            <a class="btn-soft" href="/profile">👤 Profile</a>
+            <a class="btn-soft" href="/resume-builder">📄 Resume</a>
+            <a class="btn-soft" href="/interview-prep">🎤 Interview</a>
+            <a class="btn-soft" href="/career-match">🎯 Match</a>
+            <a class="btn-soft" href="/analytics">📊 Analytics</a>
+            <a class="btn-soft" href="/saved-jobs">🔖 Saved</a>
+            <a class="btn-soft" href="/settings">⚙️ Settings</a>
+            <details class="nav-more">
+                <summary class="btn-soft">✨ More</summary>
+                <div class="nav-more-menu">
+                    <a class="btn-soft" href="/salary-negotiation">💰 Salary</a>
+                    <a class="btn-soft" href="/company-insights">🏢 Companies</a>
+                    <a class="btn-soft" href="/mentors">👥 Mentors</a>
+                    <a class="btn-soft" href="/forum">💬 Forum</a>
+                    <a class="btn-soft" href="/learning-paths">📚 Paths</a>
+                    <a class="btn-soft" href="/referrals">🤝 Refer</a>
+                    <a class="btn-soft" href="/connections">🤝 Connections</a>
+                    <a class="btn-soft" href="/leaderboard">🏆 Leaderboard</a>
+                </div>
+            </details>
+            <a class="btn-soft" href="/logout">🚪 Logout</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>🎤 Interview Preparation</h2>
+            <p>Practice with AI-generated interview questions tailored to your career</p>
+
+            <div class="interview-setup">
+                <div class="form-group-enhanced">
+                    <label>Role/Position</label>
+                    <input type="text" id="interviewRole" class="form-input-enhanced" placeholder="e.g., Software Engineer, Teacher" />
+                </div>
+                <button class="btn-soft" id="generateQuestions">Generate Questions</button>
+            </div>
+
+            <div id="questionsContainer" style="display:none">
+                <h3>Interview Questions</h3>
+                <div id="questionsList"></div>
+            </div>
+
+            <div id="practiceMode" style="display:none" class="practice-mode">
+                <h3>Practice Mode</h3>
+                <div class="current-question">
+                    <h4 id="currentQuestionText"></h4>
+                    <div class="question-category" id="currentQuestionCategory"></div>
+                    <textarea id="userAnswer" class="form-input-enhanced" rows="5" placeholder="Type your answer here..."></textarea>
+                    <div class="practice-actions">
+                        <button class="btn-soft" id="getFeedback">Get AI Feedback</button>
+                        <button class="btn-soft" id="nextQuestion">Next Question</button>
+                    </div>
+                </div>
+                <div id="feedbackSection" style="display:none">
+                    <h4>AI Feedback</h4>
+                    <div id="feedbackContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let questions = [];
+        let currentQuestionIndex = 0;
+
+        document.getElementById('generateQuestions').addEventListener('click', async () => {
+            const role = document.getElementById('interviewRole').value.trim();
+            if (!role) {
+                alert('Please enter a role');
+                return;
+            }
+
+            const res = await fetch('/api/interview-prep/questions', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({role})
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                questions = data.questions || [];
+                displayQuestions();
+            }
+        });
+
+        function displayQuestions() {
+            const container = document.getElementById('questionsList');
+            container.innerHTML = questions.map((q, idx) => `
+                <div class="question-card">
+                    <div class="question-header">
+                        <span class="question-number">Q${idx + 1}</span>
+                        <span class="question-category-badge">${q.category || 'General'}</span>
+                    </div>
+                    <h4>${q.question}</h4>
+                    <div class="question-tips">
+                        <strong>Tips:</strong> ${q.tips || 'Think about your experience and relate it to the role.'}
+                    </div>
+                    <div class="sample-answer">
+                        <strong>Sample Answer Structure:</strong>
+                        <p>${q.sample_answer || 'Structure your answer with: Situation, Task, Action, Result (STAR method)'}</p>
+                    </div>
+                    <button class="btn-soft" onclick="startPractice(${idx})">Practice This Question</button>
+                </div>
+            `).join('');
+            
+            document.getElementById('questionsContainer').style.display = 'block';
+        }
+
+        window.startPractice = (index) => {
+            currentQuestionIndex = index;
+            const q = questions[index];
+            document.getElementById('currentQuestionText').textContent = q.question;
+            document.getElementById('currentQuestionCategory').textContent = q.category || 'General';
+            document.getElementById('userAnswer').value = '';
+            document.getElementById('feedbackSection').style.display = 'none';
+            document.getElementById('practiceMode').style.display = 'block';
+            document.getElementById('practiceMode').scrollIntoView({behavior: 'smooth'});
+        };
+
+        document.getElementById('nextQuestion').addEventListener('click', () => {
+            currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
+            startPractice(currentQuestionIndex);
+        });
+
+        document.getElementById('getFeedback').addEventListener('click', async () => {
+            const answer = document.getElementById('userAnswer').value.trim();
+            if (!answer) {
+                alert('Please provide an answer first');
+                return;
+            }
+
+            const currentQ = questions[currentQuestionIndex];
+            
+            // Show loading
+            document.getElementById('feedbackContent').innerHTML = '<p>Analyzing your answer...</p>';
+            document.getElementById('feedbackSection').style.display = 'block';
+            
+            // Use enhanced AI chat for detailed feedback
+            const feedbackPrompt = `I'm practicing for an interview. The question is: "${currentQ.question}" (Category: ${currentQ.category}). My answer is: "${answer}". Please provide detailed feedback on:
+1. What I did well
+2. Areas for improvement
+3. How to structure it better (using STAR method if applicable)
+4. Specific examples I could add
+5. Overall score out of 10 and why
+
+Be constructive and specific.`;
+            
+            try {
+                const res = await fetch('/api/chat-enhanced', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({message: feedbackPrompt})
+                });
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    const aiFeedback = data.reply || '';
+                    
+                    document.getElementById('feedbackContent').innerHTML = `
+                        <div class="feedback-item">
+                            <strong>🤖 AI Feedback:</strong>
+                            <p>${aiFeedback}</p>
+                        </div>
+                        <div class="feedback-item">
+                            <strong>💡 Tips for This Question:</strong>
+                            <p>${currentQ.tips || 'Think about your experience and relate it to the role.'}</p>
+                        </div>
+                        <div class="feedback-item">
+                            <strong>📝 Sample Answer Structure:</strong>
+                            <p>${currentQ.sample_answer || 'Structure your answer with: Situation, Task, Action, Result (STAR method)'}</p>
+                        </div>
+                    `;
+                } else {
+                    // Fallback feedback
+                    document.getElementById('feedbackContent').innerHTML = `
+                        <div class="feedback-item">
+                            <strong>✅ Strengths:</strong>
+                            <p>Your answer shows good understanding. Consider adding specific examples.</p>
+                        </div>
+                        <div class="feedback-item">
+                            <strong>💡 Suggestions:</strong>
+                            <p>Try using the STAR method (Situation, Task, Action, Result) to structure your answer better.</p>
+                            <p>${currentQ.tips || ''}</p>
+                        </div>
+                        <div class="feedback-item">
+                            <strong>📝 Sample Structure:</strong>
+                            <p>${currentQ.sample_answer || ''}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                // Fallback on error
+                document.getElementById('feedbackContent').innerHTML = `
+                    <div class="feedback-item">
+                        <strong>💡 Tips:</strong>
+                        <p>${currentQ.tips || 'Think about your experience and relate it to the role.'}</p>
+                    </div>
+                    <div class="feedback-item">
+                        <strong>📝 Sample Structure:</strong>
+                        <p>${currentQ.sample_answer || 'Structure your answer with: Situation, Task, Action, Result (STAR method)'}</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

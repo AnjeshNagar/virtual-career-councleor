@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Discussion Forum - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="/static/dark-mode.js" defer></script>
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <img src="/static/images/logo.svg" alt="logo" class="logo" />
+            <h1>Virtual Career Counselor</h1>
+        </div>
+        <nav class="nav">
+            <a class="btn-soft" href="/">🏠 Home</a>
+            <a class="btn-soft" href="/dashboard">📊 Dashboard</a>
+            <a class="btn-soft" href="/career-explore">🔍 Explore</a>
+            <a class="btn-soft" href="/courses">📚 Courses</a>
+            <a class="btn-soft" href="/job-insights">💼 Jobs</a>
+            <a class="btn-soft" href="/profile">👤 Profile</a>
+            <a class="btn-soft" href="/resume-builder">📄 Resume</a>
+            <a class="btn-soft" href="/interview-prep">🎤 Interview</a>
+            <a class="btn-soft" href="/career-match">🎯 Match</a>
+            <a class="btn-soft" href="/analytics">📊 Analytics</a>
+            <a class="btn-soft" href="/saved-jobs">🔖 Saved</a>
+            <a class="btn-soft" href="/settings">⚙️ Settings</a>
+            <details class="nav-more">
+                <summary class="btn-soft">✨ More</summary>
+                <div class="nav-more-menu">
+                    <a class="btn-soft" href="/salary-negotiation">💰 Salary</a>
+                    <a class="btn-soft" href="/company-insights">🏢 Companies</a>
+                    <a class="btn-soft" href="/mentors">👥 Mentors</a>
+                    <a class="btn-soft" href="/forum">💬 Forum</a>
+                    <a class="btn-soft" href="/learning-paths">📚 Paths</a>
+                    <a class="btn-soft" href="/referrals">🤝 Refer</a>
+                    <a class="btn-soft" href="/connections">🤝 Connections</a>
+                    <a class="btn-soft" href="/leaderboard">🏆 Leaderboard</a>
+                </div>
+            </details>
+            <a class="btn-soft" href="/logout">🚪 Logout</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>💬 Discussion Forum</h2>
+            <p>Share experiences, ask questions, and connect with your community</p>
+
+            <div class="forum-controls">
+                <input type="text" id="careerFilter" class="form-input-enhanced" placeholder="Filter by career field (optional)" />
+                <button class="btn-soft" id="filterBtn">Filter</button>
+                <button class="btn-soft" id="createPostBtn">+ Create Post</button>
+            </div>
+
+            <div id="createPostForm" style="display:none" class="post-form">
+                <h3>Create New Post</h3>
+                <form id="postForm">
+                    <div class="form-group-enhanced">
+                        <label>Career Field</label>
+                        <input type="text" id="postCareer" class="form-input-enhanced" placeholder="e.g., Software Engineer" required />
+                    </div>
+                    <div class="form-group-enhanced">
+                        <label>Title</label>
+                        <input type="text" id="postTitle" class="form-input-enhanced" required />
+                    </div>
+                    <div class="form-group-enhanced">
+                        <label>Content</label>
+                        <textarea id="postContent" class="form-input-enhanced" rows="6" required></textarea>
+                    </div>
+                    <button type="submit" class="submit-button-enhanced">Post</button>
+                    <button type="button" class="btn-soft" onclick="document.getElementById('createPostForm').style.display='none'">Cancel</button>
+                </form>
+            </div>
+
+            <div id="postsList" class="posts-list"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('createPostBtn').addEventListener('click', () => {
+            document.getElementById('createPostForm').style.display = 'block';
+        });
+
+        document.getElementById('postForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const res = await fetch('/api/forum/posts', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    careerField: document.getElementById('postCareer').value,
+                    title: document.getElementById('postTitle').value,
+                    content: document.getElementById('postContent').value
+                })
+            });
+
+            if (res.ok) {
+                alert('Post created!');
+                document.getElementById('createPostForm').style.display = 'none';
+                document.getElementById('postForm').reset();
+                loadPosts();
+            }
+        });
+
+        async function loadPosts() {
+            const career = document.getElementById('careerFilter').value.trim();
+            const url = career ? `/api/forum/posts?career=${encodeURIComponent(career)}` : '/api/forum/posts';
+            
+            const res = await fetch(url);
+            if (res.ok) {
+                const data = await res.json();
+                const posts = data.posts || [];
+                const container = document.getElementById('postsList');
+                
+                if (posts.length === 0) {
+                    container.innerHTML = '<p class="muted">No posts yet. Be the first to post!</p>';
+                } else {
+                    container.innerHTML = posts.map(post => `
+                        <div class="forum-post">
+                            <div class="post-header">
+                                <div>
+                                    <h3>${post.title}</h3>
+                                    <div class="post-meta">
+                                        <span>By ${post.author?.name || 'Anonymous'}</span>
+                                        <span>•</span>
+                                        <span>${post.careerField || 'General'}</span>
+                                        <span>•</span>
+                                        <span>${new Date(post.createdAt).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                                <div class="post-likes">
+                                    <span>👍 ${post.likes || 0}</span>
+                                </div>
+                            </div>
+                            <div class="post-content">
+                                <p>${post.content}</p>
+                            </div>
+                            <div class="post-actions">
+                                <button class="btn-soft" onclick="likePost('${post.postId}')">👍 Like</button>
+                                <span class="comment-count">💬 ${(post.comments || []).length} comments</span>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+        }
+
+        window.likePost = async (postId) => {
+            // Like functionality (can be enhanced)
+            alert('Like feature coming soon!');
+        };
+
+        document.getElementById('filterBtn').addEventListener('click', loadPosts);
+        loadPosts();
+        setInterval(loadPosts, 60000); // Refresh every minute
+    </script>
+</body>
+</html>

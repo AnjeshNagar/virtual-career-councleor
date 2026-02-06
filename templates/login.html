@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body class="login-page">
+    <!-- Animated Background Elements -->
+    <div class="animated-bg">
+      <div class="bg-circle circle-1"></div>
+      <div class="bg-circle circle-2"></div>
+      <div class="bg-circle circle-3"></div>
+      <div class="bg-circle circle-4"></div>
+    </div>
+
+    <div class="login-wrapper">
+      <!-- Left Side - Image Section -->
+      <div class="login-image-section">
+        <div class="image-container">
+          <img src="/images/ChatGPT Image Jan 21, 2026, 12_27_57 PM.png" alt="VCC Hero" class="hero-image" />
+          <div class="image-overlay">
+            <div class="overlay-content">
+              <h2 class="overlay-title">Virtual Career Counselor</h2>
+              <p class="overlay-subtitle">Your personalized path to success starts here</p>
+              <div class="feature-list">
+                <div class="feature-item">✨ AI-Powered Guidance</div>
+                <div class="feature-item">📊 Personalized Roadmaps</div>
+                <div class="feature-item">🎯 Skill Assessments</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side - Login Form -->
+      <div class="login-form-section">
+        <div class="login-panel">
+          <div class="login-logo">
+            <div class="logo-icon">🎓</div>
+          </div>
+          
+          <div class="login-hero">
+            <h1 class="login-title">Welcome Back</h1>
+            <p class="login-subtitle">Sign in to continue your career journey</p>
+          </div>
+          
+          <!-- Flash Messages -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              <div class="flash-messages">
+                {% for category, message in messages %}
+                  <div class="flash-message flash-{{ category }}">
+                    <span class="flash-icon">
+                      {% if category == 'error' %}⚠️
+                      {% elif category == 'success' %}✅
+                      {% else %}ℹ️{% endif %}
+                    </span>
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+          
+          <form method="post" class="login-form">
+            <div class="form-group">
+              <label class="form-label">
+                <span class="label-text">Email Address</span>
+                <div class="input-wrapper">
+                  <span class="input-icon">📧</span>
+                  <input name="email" type="email" required autofocus class="form-input" placeholder="Enter your email" />
+                </div>
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                <span class="label-text">Password</span>
+                <div class="input-wrapper">
+                  <span class="input-icon">🔒</span>
+                  <input name="password" type="password" required class="form-input" placeholder="Enter your password" />
+                </div>
+              </label>
+            </div>
+
+            <div class="form-options">
+              <a href="/forgot-password" class="forgot-link">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="login-button">
+              <span class="button-text">Sign In</span>
+              <span class="button-arrow">→</span>
+            </button>
+          </form>
+
+          <div class="login-footer">
+            <p class="signup-prompt">
+              Don't have an account? 
+              <a href="/signup" class="signup-link">Create one now</a>
+            </p>
+            <p class="admin-prompt">
+              <a href="/admin/login" class="admin-link">🔐 Admin Login</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      // Clear localStorage when visiting login page to ensure clean session
+      localStorage.removeItem('vcc_user');
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('vcc_')) {
+          localStorage.removeItem(key);
+        }
+      });
+    </script>
+  </body>
+</html>

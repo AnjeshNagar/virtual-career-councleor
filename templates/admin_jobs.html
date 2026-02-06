@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Manage Jobs - Admin</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body class="homepage-body">
+    <div class="homepage-bg-animation">
+      <div class="bg-orb orb-1"></div>
+      <div class="bg-orb orb-2"></div>
+      <div class="bg-orb orb-3"></div>
+      <div class="bg-orb orb-4"></div>
+    </div>
+
+    <header class="topbar enhanced-topbar">
+      <div class="brand">
+        <div class="logo-wrapper">
+          <img src="/static/images/logo.svg" alt="logo" class="logo" />
+        </div>
+        <h1>Job Management</h1>
+      </div>
+      <nav class="nav">
+        <a class="btn-soft" href="/admin/dashboard">📊 Dashboard</a>
+        <a class="btn-soft" href="/admin/jobs">💼 Jobs</a>
+        <a class="btn-soft" href="/admin/applications">📝 Applications</a>
+        <a class="btn-soft" href="/admin/logout">🚪 Logout</a>
+      </nav>
+    </header>
+
+    <div class="container homepage-container">
+      <section class="card enhanced-card">
+        <div class="section-header">
+          <div class="section-icon">➕</div>
+          <h2 class="section-title">Post New Job</h2>
+        </div>
+
+        <form id="jobForm" onsubmit="submitJob(event)">
+          <div class="form-group-enhanced">
+            <label class="form-label-enhanced">Job Title *</label>
+            <input type="text" name="title" class="form-input-enhanced" required placeholder="e.g., Software Engineer" />
+          </div>
+
+          <div class="form-group-enhanced">
+            <label class="form-label-enhanced">Company Name *</label>
+            <input type="text" name="company" class="form-input-enhanced" required placeholder="e.g., Tech Corp" />
+          </div>
+
+          <div class="form-group-enhanced">
+            <label class="form-label-enhanced">Career Field/Profession *</label>
+            <input type="text" name="career_field" class="form-input-enhanced" required placeholder="e.g., Software Engineer, Teacher, CA" />
+          </div>
+
+          <div class="form-group-enhanced">
+            <label class="form-label-enhanced">Job Description *</label>
+            <textarea name="description" class="form-input-enhanced" rows="5" required placeholder="Detailed job description"></textarea>
+          </div>
+
+          <div class="form-group-enhanced">
+            <label class="form-label-enhanced">Requirements (one per line) *</label>
+            <textarea name="requirements" class="form-input-enhanced" rows="4" required placeholder="Bachelor's degree&#10;2+ years experience&#10;Python knowledge"></textarea>
+            <small style="color: #ccc; font-size: 0.9rem;">Enter each requirement on a new line</small>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group-enhanced">
+              <label class="form-label-enhanced">Experience Required</label>
+              <input type="text" name="experience_required" class="form-input-enhanced" placeholder="e.g., 2-5 years" />
+            </div>
+
+            <div class="form-group-enhanced">
+              <label class="form-label-enhanced">Job Type</label>
+              <select name="job_type" class="form-input-enhanced">
+                <option value="Full-time">Full-time</option>
+                <option value="Part-time">Part-time</option>
+                <option value="Contract">Contract</option>
+                <option value="Internship">Internship</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group-enhanced">
+              <label class="form-label-enhanced">Salary Range</label>
+              <input type="text" name="salary_range" class="form-input-enhanced" placeholder="e.g., $50,000 - $80,000" />
+            </div>
+
+            <div class="form-group-enhanced">
+              <label class="form-label-enhanced">Location</label>
+              <input type="text" name="location" class="form-input-enhanced" placeholder="e.g., New York, NY" />
+            </div>
+          </div>
+
+          <button type="submit" class="generate-button-enhanced">
+            <span class="button-icon">📤</span>
+            <span class="button-text">Post Job</span>
+          </button>
+        </form>
+      </section>
+
+      <section class="card enhanced-card" style="margin-top: 2rem;">
+        <div class="section-header">
+          <div class="section-icon">📋</div>
+          <h2 class="section-title">Active Job Postings</h2>
+        </div>
+
+        <div id="jobsList">
+          {% if jobs %}
+            {% for job in jobs %}
+            <div class="job-card" style="margin-bottom: 1rem; padding: 1.5rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                <div>
+                  <h3>{{ job.title }}</h3>
+                  <p style="color: #666; margin-top: 0.5rem;">{{ job.company }} • {{ job.location or 'Location not specified' }}</p>
+                </div>
+                <button onclick="deleteJob('{{ job.jobId }}')" class="btn-soft" style="background: rgba(244, 67, 54, 0.2);">Delete</button>
+              </div>
+              <div style="margin-bottom: 1rem;">
+                <p><strong>Career Field:</strong> {{ job.career_field }}</p>
+                <p><strong>Salary:</strong> {{ job.salary_range or 'Not specified' }}</p>
+                <p><strong>Experience:</strong> {{ job.experience_required or 'Not specified' }}</p>
+                <p><strong>Type:</strong> {{ job.job_type }}</p>
+              </div>
+              <div style="margin-bottom: 1rem;">
+                <p><strong>Description:</strong></p>
+                <p style="color: #ccc;">{{ job.description[:200] }}{% if job.description|length > 200 %}...{% endif %}</p>
+              </div>
+              {% if job.requirements %}
+              <div>
+                <p><strong>Requirements:</strong></p>
+                <ul>
+                  {% for req in job.requirements %}
+                  <li>{{ req }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+              {% endif %}
+              <p style="color: #666; font-size: 0.9rem; margin-top: 1rem;">Posted: {{ job.createdAt[:10] }}</p>
+            </div>
+            {% endfor %}
+          {% else %}
+            <p style="text-align: center; padding: 2rem;">No jobs posted yet. Create your first job posting above!</p>
+          {% endif %}
+        </div>
+      </section>
+    </div>
+
+    <script>
+      async function submitJob(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        
+        const jobData = {
+          title: formData.get('title'),
+          company: formData.get('company'),
+          description: formData.get('description'),
+          requirements: formData.get('requirements').split('\n').filter(r => r.trim()),
+          experience_required: formData.get('experience_required'),
+          salary_range: formData.get('salary_range'),
+          location: formData.get('location'),
+          job_type: formData.get('job_type'),
+          career_field: formData.get('career_field')
+        };
+
+        try {
+          const res = await fetch('/admin/jobs', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(jobData)
+          });
+
+          const data = await res.json();
+          if (res.ok) {
+            alert('Job posted successfully!');
+            form.reset();
+            location.reload();
+          } else {
+            alert('Error: ' + (data.error || 'Failed to post job'));
+          }
+        } catch (error) {
+          alert('Error: ' + error.message);
+        }
+      }
+
+      async function deleteJob(jobId) {
+        if (!confirm('Are you sure you want to delete this job posting?')) return;
+
+        try {
+          const res = await fetch(`/admin/jobs/${jobId}/delete`, {
+            method: 'POST'
+          });
+
+          if (res.ok) {
+            alert('Job deleted successfully!');
+            location.reload();
+          } else {
+            alert('Error deleting job');
+          }
+        } catch (error) {
+          alert('Error: ' + error.message);
+        }
+      }
+    </script>
+  </body>
+</html>

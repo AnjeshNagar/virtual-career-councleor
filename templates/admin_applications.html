@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Manage Applications - Admin</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body class="homepage-body">
+    <div class="homepage-bg-animation">
+      <div class="bg-orb orb-1"></div>
+      <div class="bg-orb orb-2"></div>
+      <div class="bg-orb orb-3"></div>
+      <div class="bg-orb orb-4"></div>
+    </div>
+
+    <header class="topbar enhanced-topbar">
+      <div class="brand">
+        <div class="logo-wrapper">
+          <img src="/static/images/logo.svg" alt="logo" class="logo" />
+        </div>
+        <h1>Application Management</h1>
+      </div>
+      <nav class="nav">
+        <a class="btn-soft" href="/admin/dashboard">📊 Dashboard</a>
+        <a class="btn-soft" href="/admin/jobs">💼 Jobs</a>
+        <a class="btn-soft" href="/admin/applications">📝 Applications</a>
+        <a class="btn-soft" href="/admin/logout">🚪 Logout</a>
+      </nav>
+    </header>
+
+    <div class="container homepage-container">
+      <section class="card enhanced-card">
+        <div class="section-header">
+          <div class="section-icon">📝</div>
+          <h2 class="section-title">Job Applications</h2>
+          <p class="section-subtitle">Review and manage job applications</p>
+        </div>
+
+        {% if applications %}
+          {% for app in applications %}
+          <div class="application-card" style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+              <div>
+                <h3>{{ app.fullName }}</h3>
+                <p style="color: #666; margin-top: 0.5rem;">
+                  Applied for: <strong>{{ app.job.title if app.job else 'Unknown Position' }}</strong>
+                </p>
+                <p style="color: #666; font-size: 0.9rem;">{{ app.createdAt[:19] }}</p>
+              </div>
+              <span style="padding: 0.5rem 1rem; border-radius: 12px; background: {% if app.status == 'pending' %}rgba(255, 152, 0, 0.2){% elif app.status == 'accepted' %}rgba(76, 175, 80, 0.2){% elif app.status == 'interview_scheduled' %}rgba(33, 150, 243, 0.2){% else %}rgba(244, 67, 54, 0.2){% endif %};">
+                {{ app.status|title|replace('_', ' ') }}
+              </span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+              <div>
+                <strong>📧 Email:</strong>
+                <p>{{ app.email }}</p>
+              </div>
+              <div>
+                <strong>📞 Phone:</strong>
+                <p>{{ app.phone }}</p>
+              </div>
+              <div>
+                <strong>🎓 Education:</strong>
+                <p>{{ app.education }}</p>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+              <strong>💼 Experience:</strong>
+              <p style="color: #ccc; margin-top: 0.5rem;">{{ app.experience }}</p>
+            </div>
+
+            {% if app.skills %}
+            <div style="margin-bottom: 1rem;">
+              <strong>🛠️ Skills:</strong>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+                {% for skill in app.skills %}
+                <span style="padding: 0.25rem 0.75rem; background: rgba(33, 150, 243, 0.2); border-radius: 12px;">{{ skill }}</span>
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
+
+            {% if app.coverLetter %}
+            <div style="margin-bottom: 1rem;">
+              <strong>📄 Cover Letter:</strong>
+              <p style="color: #ccc; margin-top: 0.5rem;">{{ app.coverLetter }}</p>
+            </div>
+            {% endif %}
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+              <button onclick="updateApplicationStatus('{{ app.applicationId }}', 'accepted')" 
+                      class="generate-button-enhanced" 
+                      style="background: rgba(76, 175, 80, 0.2);"
+                      {% if app.status == 'accepted' %}disabled{% endif %}>
+                ✅ Accept
+              </button>
+              <button onclick="updateApplicationStatus('{{ app.applicationId }}', 'interview_scheduled')" 
+                      class="generate-button-enhanced"
+                      style="background: rgba(33, 150, 243, 0.2);"
+                      {% if app.status == 'interview_scheduled' %}disabled{% endif %}>
+                📅 Schedule Interview
+              </button>
+              <button onclick="updateApplicationStatus('{{ app.applicationId }}', 'rejected')" 
+                      class="generate-button-enhanced"
+                      style="background: rgba(244, 67, 54, 0.2);"
+                      {% if app.status == 'rejected' %}disabled{% endif %}>
+                ❌ Reject
+              </button>
+            </div>
+
+            {% if app.adminNotes %}
+            <div style="margin-top: 1rem; padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+              <strong>📝 Admin Notes:</strong>
+              <p style="color: #ccc; margin-top: 0.5rem;">{{ app.adminNotes }}</p>
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        {% else %}
+          <p style="text-align: center; padding: 2rem;">No applications yet.</p>
+        {% endif %}
+      </section>
+    </div>
+
+    <script>
+      async function updateApplicationStatus(applicationId, status) {
+        const statusMessages = {
+          'accepted': 'accept',
+          'rejected': 'reject',
+          'interview_scheduled': 'schedule an interview for'
+        };
+
+        if (!confirm(`Are you sure you want to ${statusMessages[status]} this application?`)) return;
+
+        try {
+          const res = await fetch(`/admin/applications/${applicationId}/update`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({status})
+          });
+
+          const data = await res.json();
+          if (res.ok) {
+            alert(`Application ${statusMessages[status]} successfully!`);
+            location.reload();
+          } else {
+            alert('Error: ' + (data.error || 'Failed to update application'));
+          }
+        } catch (error) {
+          alert('Error: ' + error.message);
+        }
+      }
+    </script>
+  </body>
+</html>

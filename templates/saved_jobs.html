@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Saved Jobs - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <img src="/static/images/logo.svg" alt="logo" class="logo" />
+            <h1>Virtual Career Counselor</h1>
+        </div>
+        <nav class="nav">
+            <a class="btn-soft" href="/">🏠 Home</a>
+            <a class="btn-soft" href="/dashboard">📊 Dashboard</a>
+            <a class="btn-soft" href="/career-explore">🔍 Explore</a>
+            <a class="btn-soft" href="/courses">📚 Courses</a>
+            <a class="btn-soft" href="/job-insights">💼 Jobs</a>
+            <a class="btn-soft" href="/profile">👤 Profile</a>
+            <a class="btn-soft" href="/resume-builder">📄 Resume</a>
+            <a class="btn-soft" href="/interview-prep">🎤 Interview</a>
+            <a class="btn-soft" href="/career-match">🎯 Match</a>
+            <a class="btn-soft" href="/analytics">📊 Analytics</a>
+            <a class="btn-soft" href="/saved-jobs">🔖 Saved</a>
+            <a class="btn-soft" href="/settings">⚙️ Settings</a>
+            <details class="nav-more">
+                <summary class="btn-soft">✨ More</summary>
+                <div class="nav-more-menu">
+                    <a class="btn-soft" href="/salary-negotiation">💰 Salary</a>
+                    <a class="btn-soft" href="/company-insights">🏢 Companies</a>
+                    <a class="btn-soft" href="/mentors">👥 Mentors</a>
+                    <a class="btn-soft" href="/forum">💬 Forum</a>
+                    <a class="btn-soft" href="/learning-paths">📚 Paths</a>
+                    <a class="btn-soft" href="/referrals">🤝 Refer</a>
+                    <a class="btn-soft" href="/connections">🤝 Connections</a>
+                    <a class="btn-soft" href="/leaderboard">🏆 Leaderboard</a>
+                </div>
+            </details>
+            <a class="btn-soft" href="/logout">🚪 Logout</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>🔖 Saved Jobs</h2>
+            <p>Your bookmarked job opportunities</p>
+            
+            <div id="savedJobsList" class="jobs-list-container">
+                <p class="muted">Loading saved jobs...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadSavedJobs() {
+            const res = await fetch('/api/saved-jobs');
+            const container = document.getElementById('savedJobsList');
+            
+            if (res.ok) {
+                const data = await res.json();
+                const jobs = data.jobs || [];
+                
+                if (jobs.length === 0) {
+                    container.innerHTML = '<p class="muted">No saved jobs yet. <a href="/job-insights">Browse jobs →</a></p>';
+                } else {
+                    container.innerHTML = `
+                        <div class="jobs-grid">
+                            ${jobs.map(job => `
+                                <div class="job-card">
+                                    <div class="job-header">
+                                        <h3>${job.title || 'Job Title'}</h3>
+                                        <span class="job-company">${job.company || 'Company'}</span>
+                                    </div>
+                                    <div class="job-details">
+                                        <div class="job-detail-item">
+                                            <span class="detail-icon">📍</span>
+                                            <span>${job.location || 'Location not specified'}</span>
+                                        </div>
+                                        <div class="job-detail-item">
+                                            <span class="detail-icon">💰</span>
+                                            <span>${job.salary_range || 'Salary not specified'}</span>
+                                        </div>
+                                        <div class="job-detail-item">
+                                            <span class="detail-icon">⏰</span>
+                                            <span>${job.job_type || 'Full-time'}</span>
+                                        </div>
+                                    </div>
+                                    <div class="job-description">
+                                        <p>${(job.description || '').substring(0, 200)}${job.description && job.description.length > 200 ? '...' : ''}</p>
+                                    </div>
+                                    <div class="job-actions">
+                                        <button class="apply-job-btn" onclick="showApplicationForm('${job.jobId}', '${job.title}', '${job.company}')">
+                                            Apply Now
+                                        </button>
+                                        <button class="save-job-btn saved" onclick="unsaveJob('${job.jobId}')">
+                                            <span>✅</span> Saved
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+            } else {
+                container.innerHTML = '<p class="muted">Error loading saved jobs.</p>';
+            }
+        }
+
+        window.unsaveJob = async (jobId) => {
+            const res = await fetch(`/api/jobs/${jobId}/unsave`, {method: 'POST'});
+            if (res.ok) {
+                loadSavedJobs();
+            }
+        };
+
+        window.showApplicationForm = (jobId, jobTitle, companyName) => {
+            window.location.href = `/job-insights#apply-${jobId}`;
+        };
+
+        loadSavedJobs();
+    </script>
+</body>
+</html>

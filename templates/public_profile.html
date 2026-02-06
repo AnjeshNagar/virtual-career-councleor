@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ profile.fullName }} - Public Profile</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <img src="/static/images/logo.svg" alt="logo" class="logo" />
+            <h1>Virtual Career Counselor</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card public-profile-card">
+            <div class="profile-header">
+                {% if profile.photo %}
+                <img src="{{ profile.photo }}" alt="{{ profile.fullName }}" class="profile-photo-large" />
+                {% else %}
+                <div class="profile-photo-placeholder-large">👤</div>
+                {% endif %}
+                <div class="profile-info">
+                    <h1>{{ profile.fullName }}</h1>
+                    <p class="profile-role">{{ profile.currentRole }} → {{ profile.targetRole }}</p>
+                    {% if profile.bio %}
+                    <p class="profile-bio">{{ profile.bio }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if profile.skills %}
+            <div class="profile-section">
+                <h2>Skills</h2>
+                <div class="skills-grid">
+                    {% for skill in profile.skills %}
+                    <div class="skill-badge">{{ skill }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if profile.education %}
+            <div class="profile-section">
+                <h2>Education</h2>
+                {% for edu in profile.education %}
+                <div class="education-item">
+                    <h3>{{ edu.degree }}</h3>
+                    <p>{{ edu.institution }} - {{ edu.year }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if profile.portfolio and profile.portfolio.projects %}
+            <div class="profile-section">
+                <h2>Projects</h2>
+                {% for project in profile.portfolio.projects %}
+                <div class="project-item">
+                    <h3>{{ project.name }}</h3>
+                    <p>{{ project.description }}</p>
+                    {% if project.link %}
+                    <a href="{{ project.link }}" target="_blank">View Project →</a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if profile.portfolio and profile.portfolio.certifications %}
+            <div class="profile-section">
+                <h2>Certifications</h2>
+                {% for cert in profile.portfolio.certifications %}
+                <div class="certification-item">
+                    <h3>{{ cert.name }}</h3>
+                    <p>{{ cert.organization }} - {{ cert.year }}</p>
+                    {% if cert.credentialId %}
+                    <p class="credential-id">ID: {{ cert.credentialId }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="profile-footer">
+                <p>This profile was created on Virtual Career Counselor</p>
+                <a href="/" class="btn-soft">Create Your Profile →</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Career Match - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="/static/dark-mode.js" defer></script>
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <img src="/static/images/logo.svg" alt="logo" class="logo" />
+            <h1>Virtual Career Counselor</h1>
+        </div>
+        <nav class="nav">
+            <a class="btn-soft" href="/">🏠 Home</a>
+            <a class="btn-soft" href="/dashboard">📊 Dashboard</a>
+            <a class="btn-soft" href="/career-explore">🔍 Explore</a>
+            <a class="btn-soft" href="/courses">📚 Courses</a>
+            <a class="btn-soft" href="/job-insights">💼 Jobs</a>
+            <a class="btn-soft" href="/profile">👤 Profile</a>
+            <a class="btn-soft" href="/resume-builder">📄 Resume</a>
+            <a class="btn-soft" href="/interview-prep">🎤 Interview</a>
+            <a class="btn-soft" href="/career-match">🎯 Match</a>
+            <a class="btn-soft" href="/analytics">📊 Analytics</a>
+            <a class="btn-soft" href="/saved-jobs">🔖 Saved</a>
+            <a class="btn-soft" href="/settings">⚙️ Settings</a>
+            <details class="nav-more">
+                <summary class="btn-soft">✨ More</summary>
+                <div class="nav-more-menu">
+                    <a class="btn-soft" href="/salary-negotiation">💰 Salary</a>
+                    <a class="btn-soft" href="/company-insights">🏢 Companies</a>
+                    <a class="btn-soft" href="/mentors">👥 Mentors</a>
+                    <a class="btn-soft" href="/forum">💬 Forum</a>
+                    <a class="btn-soft" href="/learning-paths">📚 Paths</a>
+                    <a class="btn-soft" href="/referrals">🤝 Refer</a>
+                    <a class="btn-soft" href="/connections">🤝 Connections</a>
+                    <a class="btn-soft" href="/leaderboard">🏆 Leaderboard</a>
+                </div>
+            </details>
+            <a class="btn-soft" href="/logout">🚪 Logout</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>🎯 AI Career Matching</h2>
+            <p>Discover careers that match your personality and interests</p>
+
+            <div id="testContainer">
+                <div class="personality-test">
+                    <h3>Personality Assessment</h3>
+                    <p>Answer these questions to find your ideal career match</p>
+                    
+                    <form id="personalityTestForm">
+                        <div class="question-group">
+                            <label>1. How do you prefer to work?</label>
+                            <select name="work_style" class="form-input-enhanced" required>
+                                <option value="">Select...</option>
+                                <option value="team">In a team collaboratively</option>
+                                <option value="independent">Independently</option>
+                                <option value="mixed">Mix of both</option>
+                            </select>
+                        </div>
+
+                        <div class="question-group">
+                            <label>2. What motivates you most?</label>
+                            <select name="motivation" class="form-input-enhanced" required>
+                                <option value="">Select...</option>
+                                <option value="creativity">Creative expression</option>
+                                <option value="problem_solving">Solving complex problems</option>
+                                <option value="helping">Helping others</option>
+                                <option value="achievement">Achieving goals and recognition</option>
+                            </select>
+                        </div>
+
+                        <div class="question-group">
+                            <label>3. How do you handle stress?</label>
+                            <select name="stress_handling" class="form-input-enhanced" required>
+                                <option value="">Select...</option>
+                                <option value="calm">Stay calm and analytical</option>
+                                <option value="active">Take action immediately</option>
+                                <option value="collaborative">Seek support from others</option>
+                            </select>
+                        </div>
+
+                        <div class="question-group">
+                            <label>4. What type of environment do you prefer?</label>
+                            <select name="environment" class="form-input-enhanced" required>
+                                <option value="">Select...</option>
+                                <option value="structured">Structured and organized</option>
+                                <option value="flexible">Flexible and dynamic</option>
+                                <option value="balanced">Balanced approach</option>
+                            </select>
+                        </div>
+
+                        <div class="question-group">
+                            <label>5. What skills do you enjoy using most?</label>
+                            <select name="skills_preference" class="form-input-enhanced" required>
+                                <option value="">Select...</option>
+                                <option value="technical">Technical/analytical skills</option>
+                                <option value="creative">Creative/artistic skills</option>
+                                <option value="communication">Communication/interpersonal skills</option>
+                                <option value="leadership">Leadership/management skills</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="submit-button-enhanced">🔍 Find My Career Match</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="resultsContainer" style="display:none">
+                <h3>Your Career Matches</h3>
+                <div id="personalityType"></div>
+                <div id="careerMatches"></div>
+                <div id="insights"></div>
+                <button class="btn-soft" onclick="document.getElementById('resultsContainer').style.display='none'; document.getElementById('testContainer').style.display='block'">Take Test Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('personalityTestForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const answers = {};
+            for (const [key, value] of formData.entries()) {
+                answers[key] = value;
+            }
+
+            const res = await fetch('/api/career-match', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({answers})
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                const results = data.results || {};
+                
+                document.getElementById('personalityType').innerHTML = `
+                    <div class="personality-type-card">
+                        <h4>Your Personality Type</h4>
+                        <p>${results.personality_type || 'Analytical & Creative'}</p>
+                    </div>
+                `;
+
+                const careers = results.careers || [];
+                document.getElementById('careerMatches').innerHTML = `
+                    <h4>Recommended Careers</h4>
+                    <div class="career-matches-grid">
+                        ${careers.map(career => `
+                            <div class="career-match-card">
+                                <div class="match-score">${career.fit_score}% Match</div>
+                                <h5>${career.career}</h5>
+                                <p><strong>Why it matches:</strong> ${career.reason}</p>
+                                <div class="career-details">
+                                    <div><strong>Skills Needed:</strong> ${(career.skills_needed || []).join(', ')}</div>
+                                    <div><strong>Growth Potential:</strong> ${career.growth_potential}</div>
+                                </div>
+                                <a href="/career-explore" class="btn-soft" onclick="localStorage.setItem('exploreCareer', '${career.career}')">Explore This Career</a>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                document.getElementById('insights').innerHTML = `
+                    <div class="insights-card">
+                        <h4>💡 Insights</h4>
+                        <p>${results.insights || 'Based on your answers, you have a balanced personality suitable for various career paths.'}</p>
+                    </div>
+                `;
+
+                document.getElementById('testContainer').style.display = 'none';
+                document.getElementById('resultsContainer').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

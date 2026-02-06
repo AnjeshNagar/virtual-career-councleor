@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Salary Negotiation Assistant - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="/static/dark-mode.js" defer></script>
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <img src="/static/images/logo.svg" alt="logo" class="logo" />
+            <h1>Virtual Career Counselor</h1>
+        </div>
+        <nav class="nav">
+            <a class="btn-soft" href="/">🏠 Home</a>
+            <a class="btn-soft" href="/dashboard">📊 Dashboard</a>
+            <a class="btn-soft" href="/logout">🚪 Logout</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>💰 Salary Negotiation Assistant</h2>
+            <p>Get AI-powered tips and strategies for salary negotiations</p>
+
+            <form id="negotiationForm" class="enhanced-form">
+                <div class="form-group-enhanced">
+                    <label>Role/Position *</label>
+                    <input type="text" id="role" class="form-input-enhanced" placeholder="e.g., Software Engineer" required />
+                </div>
+
+                <div class="form-group-enhanced">
+                    <label>Location (Optional)</label>
+                    <input type="text" id="location" class="form-input-enhanced" placeholder="e.g., New York, CA" />
+                </div>
+
+                <div class="form-group-enhanced">
+                    <label>Current Salary (Optional)</label>
+                    <input type="text" id="currentSalary" class="form-input-enhanced" placeholder="e.g., $70,000" />
+                </div>
+
+                <div class="form-group-enhanced">
+                    <label>Offer Amount (Optional)</label>
+                    <input type="text" id="offerAmount" class="form-input-enhanced" placeholder="e.g., $85,000" />
+                </div>
+
+                <button type="submit" class="submit-button-enhanced">Get Negotiation Tips</button>
+            </form>
+
+            <div id="tipsContainer" style="display:none" class="negotiation-tips">
+                <h3>💡 Negotiation Tips & Strategies</h3>
+                <div id="tipsContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('negotiationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const role = document.getElementById('role').value.trim();
+            if (!role) {
+                alert('Please enter a role');
+                return;
+            }
+
+            const payload = {
+                role,
+                location: document.getElementById('location').value.trim() || null,
+                currentSalary: document.getElementById('currentSalary').value.trim() || null,
+                offerAmount: document.getElementById('offerAmount').value.trim() || null
+            };
+
+            const res = await fetch('/api/salary-negotiation', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                const tips = data.tips || {};
+                
+                document.getElementById('tipsContent').innerHTML = `
+                    <div class="tip-section">
+                        <h4>📊 Market Salary Range</h4>
+                        <p class="market-range">${tips.market_range || 'N/A'}</p>
+                    </div>
+
+                    <div class="tip-section">
+                        <h4>✅ Strategies to Use</h4>
+                        <ul>
+                            ${(tips.strategies || []).map(s => `<li>${s}</li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <div class="tip-section">
+                        <h4>💬 Phrases to Use</h4>
+                        <ul class="phrases-list">
+                            ${(tips.phrases_to_use || []).map(p => `<li>"${p}"</li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <div class="tip-section">
+                        <h4>❌ Phrases to Avoid</h4>
+                        <ul class="phrases-list avoid">
+                            ${(tips.phrases_to_avoid || []).map(p => `<li>"${p}"</li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <div class="tip-section">
+                        <h4>💼 Counter-Offer Suggestions</h4>
+                        <p>${tips.counter_offer_suggestions || 'Consider negotiating 10-15% above the initial offer'}</p>
+                    </div>
+
+                    <div class="tip-section">
+                        <h4>🎁 Benefits to Negotiate</h4>
+                        <ul>
+                            ${(tips.benefits_to_negotiate || []).map(b => `<li>${b}</li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <div class="tip-section evaluation">
+                        <h4>📈 Offer Evaluation</h4>
+                        <p>${tips.evaluation || 'Evaluate based on market rates and your experience level'}</p>
+                    </div>
+                `;
+
+                document.getElementById('tipsContainer').style.display = 'block';
+                document.getElementById('tipsContainer').scrollIntoView({behavior: 'smooth'});
+            }
+        });
+    </script>
+</body>
+</html>

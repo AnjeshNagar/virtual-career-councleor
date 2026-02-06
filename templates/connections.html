@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Connections - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="/static/dark-mode.js" defer></script>
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <img src="/static/images/logo.svg" alt="logo" class="logo" />
+            <h1>Virtual Career Counselor</h1>
+        </div>
+        <nav class="nav">
+            <a class="btn-soft" href="/">🏠 Home</a>
+            <a class="btn-soft" href="/dashboard">📊 Dashboard</a>
+            <a class="btn-soft" href="/mentors">👥 Mentors</a>
+            <a class="btn-soft" href="/forum">💬 Forum</a>
+            <a class="btn-soft" href="/logout">🚪 Logout</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>🤝 My Connections</h2>
+            <p>Connect with peers and mentors in your career field</p>
+
+            <div id="connectionsList" class="connections-list"></div>
+        </div>
+    </div>
+
+    <script>
+        async function loadConnections() {
+            const res = await fetch('/api/connections');
+            if (res.ok) {
+                const data = await res.json();
+                const connections = data.connections || [];
+                const container = document.getElementById('connectionsList');
+                
+                if (connections.length === 0) {
+                    container.innerHTML = `
+                        <p class="muted">No connections yet.</p>
+                        <a href="/mentors" class="btn-soft">Find Mentors →</a>
+                    `;
+                } else {
+                    container.innerHTML = connections.map(c => {
+                        const user = c.user || {};
+                        const profile = user.profile || {};
+                        const connection = c.connection || {};
+                        return `
+                            <div class="connection-card">
+                                <div class="connection-header">
+                                    <h3>${profile.fullName || profile.name || 'User'}</h3>
+                                    <span class="connection-date">Connected ${new Date(connection.acceptedAt || connection.createdAt).toLocaleDateString()}</span>
+                                </div>
+                                <div class="connection-details">
+                                    <p><strong>Role:</strong> ${profile.targetRole || profile.currentRole || 'Not specified'}</p>
+                                    ${profile.bio ? `<p>${profile.bio.substring(0, 100)}...</p>` : ''}
+                                </div>
+                                <div class="connection-actions">
+                                    <a href="/profile/${user.publicProfileId || user.userId}" class="btn-soft" target="_blank">View Profile</a>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+        }
+
+        loadConnections();
+        setInterval(loadConnections, 30000); // Refresh every 30 seconds
+    </script>
+</body>
+</html>

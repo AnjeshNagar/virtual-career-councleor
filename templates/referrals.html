@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Referral Program - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="/static/dark-mode.js" defer></script>
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <img src="/static/images/logo.svg" alt="logo" class="logo" />
+            <h1>Virtual Career Counselor</h1>
+        </div>
+        <nav class="nav">
+            <a class="btn-soft" href="/">🏠 Home</a>
+            <a class="btn-soft" href="/dashboard">📊 Dashboard</a>
+            <a class="btn-soft" href="/logout">🚪 Logout</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>🤝 Referral Program</h2>
+            <p>Invite friends and earn rewards!</p>
+
+            <div class="referral-section">
+                <h3>Your Referral Code</h3>
+                <div class="referral-code-display">
+                    <input type="text" id="referralCode" readonly class="form-input-enhanced" />
+                    <button class="btn-soft" id="copyCodeBtn">📋 Copy</button>
+                    <button class="btn-soft" id="generateCodeBtn">Generate Code</button>
+                </div>
+                <p class="muted">Share this code with friends. When they sign up using your code, you both get rewards!</p>
+            </div>
+
+            <div class="referral-stats">
+                <h3>Your Referral Stats</h3>
+                <div id="referralStats" class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="referralCount">0</div>
+                        <div class="stat-label">Friends Referred</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="referralRewards">0 XP</div>
+                        <div class="stat-label">Total Rewards</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="referral-benefits">
+                <h3>🎁 Referral Benefits</h3>
+                <ul>
+                    <li>✅ You get <strong>100 XP</strong> for each friend you refer</li>
+                    <li>✅ Your friend gets <strong>50 XP</strong> when they sign up</li>
+                    <li>✅ Earn the <strong>Super Connector</strong> badge when you refer 5+ friends</li>
+                    <li>✅ Help your friends start their career journey!</li>
+                </ul>
+            </div>
+
+            <div class="share-section">
+                <h3>Share Your Code</h3>
+                <div class="share-buttons">
+                    <button class="btn-soft" onclick="shareOnSocial('twitter')">🐦 Twitter</button>
+                    <button class="btn-soft" onclick="shareOnSocial('facebook')">📘 Facebook</button>
+                    <button class="btn-soft" onclick="shareOnSocial('linkedin')">💼 LinkedIn</button>
+                    <button class="btn-soft" onclick="shareViaEmail()">📧 Email</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadReferralCode() {
+            const res = await fetch('/api/referrals/code');
+            if (res.ok) {
+                const data = await res.json();
+                document.getElementById('referralCode').value = data.code || 'Not generated';
+            }
+        }
+
+        document.getElementById('generateCodeBtn').addEventListener('click', async () => {
+            await loadReferralCode();
+        });
+
+        document.getElementById('copyCodeBtn').addEventListener('click', () => {
+            const code = document.getElementById('referralCode');
+            code.select();
+            document.execCommand('copy');
+            alert('Referral code copied to clipboard!');
+        });
+
+        window.shareOnSocial = (platform) => {
+            const code = document.getElementById('referralCode').value;
+            const url = window.location.origin;
+            const text = `Join me on Virtual Career Counselor! Use my referral code: ${code} - ${url}`;
+            
+            const urls = {
+                twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`,
+                facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+                linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`
+            };
+            
+            if (urls[platform]) {
+                window.open(urls[platform], '_blank');
+            }
+        };
+
+        window.shareViaEmail = () => {
+            const code = document.getElementById('referralCode').value;
+            const url = window.location.origin;
+            const subject = 'Join Virtual Career Counselor!';
+            const body = `Hi! I've been using Virtual Career Counselor and it's amazing! Join me using my referral code: ${code}\n\n${url}`;
+            window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        };
+
+        loadReferralCode();
+    </script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Leaderboard - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <img src="/static/images/logo.svg" alt="logo" class="logo" />
+        <h1>Leaderboard</h1>
+      </div>
+      <nav class="nav">
+        <a class="btn-soft" href="/dashboard">Dashboard</a>
+        <a class="btn-soft" href="/activities">Activities</a>
+      </nav>
+    </header>
+    <div class="container card">
+      <p class="muted">Top learners by average score on completed quizzes.</p>
+      <div id="board"></div>
+    </div>
+
+    <script>
+      async function loadBoard(){
+        const res = await fetch('/api/leaderboard');
+        const j = await res.json();
+        const rows = j.rows || [];
+        const el = document.getElementById('board');
+        if(!rows.length){ el.innerHTML = '<p>No leaderboard data yet.</p>'; return }
+        el.innerHTML = '<ol>' + rows.map(r=>`<li><strong>${r.display}</strong> — Avg: ${r.avgScore}% — Completed: ${r.completed}</li>`).join('') + '</ol>';
+      }
+      loadBoard();
+    </script>
+  </body>
+</html>

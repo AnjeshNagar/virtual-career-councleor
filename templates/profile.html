@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Profile - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="/static/navbar.js" defer></script>
+</head>
+<body>
+    <header class="topbar enhanced-topbar">
+        <div class="brand">
+            <div class="logo-wrapper">
+                <img src="/static/images/logo.svg" alt="logo" class="logo" />
+            </div>
+            <h1>Virtual Career Counselor</h1>
+        </div>
+        
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <nav class="nav" id="mainNav">
+            <a class="nav-link" href="/">🏠 Home</a>
+            <a class="nav-link" href="/dashboard">📊 Dashboard</a>
+            
+            <!-- Career Development Dropdown -->
+            <div class="nav-dropdown">
+                <button class="nav-link dropdown-toggle">🚀 Career</button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/career-explore">🔍 Explore Careers</a>
+                    <a class="dropdown-item" href="/career-match">🎯 Career Match</a>
+                    <a class="dropdown-item" href="/learning-paths">📚 Learning Paths</a>
+                    <a class="dropdown-item" href="/analytics">📊 Career Analytics</a>
+                </div>
+            </div>
+
+            <!-- Learning & Skills Dropdown -->
+            <div class="nav-dropdown">
+                <button class="nav-link dropdown-toggle">📚 Learning</button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/courses">📖 Courses</a>
+                    <a class="dropdown-item" href="/resume-builder">📄 Resume Builder</a>
+                    <a class="dropdown-item" href="/interview-prep">🎤 Interview Prep</a>
+                    <a class="dropdown-item" href="/salary-negotiation">💰 Salary Negotiation</a>
+                </div>
+            </div>
+
+            <!-- Jobs & Network Dropdown -->
+            <div class="nav-dropdown">
+                <button class="nav-link dropdown-toggle">💼 Jobs</button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/job-insights">🔍 Job Insights</a>
+                    <a class="dropdown-item" href="/saved-jobs">🔖 Saved Jobs</a>
+                    <a class="dropdown-item" href="/company-insights">🏢 Companies</a>
+                    <a class="dropdown-item" href="/referrals">🤝 Referrals</a>
+                </div>
+            </div>
+
+            <!-- Community Dropdown -->
+            <div class="nav-dropdown">
+                <button class="nav-link dropdown-toggle">👥 Community</button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/mentors">👨‍🏫 Mentors</a>
+                    <a class="dropdown-item" href="/forum">💬 Forum</a>
+                    <a class="dropdown-item" href="/connections">🤝 Connections</a>
+                    <a class="dropdown-item" href="/leaderboard">🏆 Leaderboard</a>
+                </div>
+            </div>
+
+            <!-- Profile & Settings -->
+            <div class="nav-dropdown">
+                <button class="nav-link dropdown-toggle">👤 Account</button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/profile">👤 Profile</a>
+                    <a class="dropdown-item" href="/settings">⚙️ Settings</a>
+                    <a class="dropdown-item" href="/logout">🚪 Logout</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>👤 My Profile & Portfolio</h2>
+            
+            <div class="profile-header">
+                <div class="profile-photo-section">
+                    <div class="profile-photo-placeholder" id="photoPreview">
+                        <span>📷</span>
+                        <p>Click to upload photo</p>
+                    </div>
+                    <input type="file" id="photoUpload" accept="image/*" style="display:none" />
+                </div>
+                <div class="profile-info">
+                    <h3 id="profileName">Your Name</h3>
+                    <p id="profileRole">Current Role → Target Role</p>
+                    <button class="btn-soft" id="generatePublicLink">🔗 Generate Public Profile Link</button>
+                </div>
+            </div>
+
+            <form id="profileForm" class="enhanced-form">
+                <div class="form-section">
+                    <h3>Basic Information</h3>
+                    <div class="form-group-enhanced">
+                        <label>Full Name</label>
+                        <input type="text" id="fullName" class="form-input-enhanced" />
+                    </div>
+                    <div class="form-group-enhanced">
+                        <label>Bio / Professional Summary</label>
+                        <textarea id="bio" class="form-input-enhanced" rows="4" placeholder="Tell us about yourself..."></textarea>
+                    </div>
+                    <div class="form-group-enhanced">
+                        <label>Current Role</label>
+                        <input type="text" id="currentRole" class="form-input-enhanced" />
+                    </div>
+                    <div class="form-group-enhanced">
+                        <label>Target Role</label>
+                        <input type="text" id="targetRole" class="form-input-enhanced" />
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Skills</h3>
+                    <div id="skillsContainer" class="skills-container">
+                        <!-- Skills will be added here -->
+                    </div>
+                    <input type="text" id="newSkill" class="form-input-enhanced" placeholder="Add a skill and press Enter" />
+                </div>
+
+                <div class="form-section">
+                    <h3>Education</h3>
+                    <div id="educationContainer">
+                        <!-- Education entries will be added here -->
+                    </div>
+                    <button type="button" class="btn-soft" id="addEducation">+ Add Education</button>
+                </div>
+
+                <div class="form-section">
+                    <h3>Portfolio Projects</h3>
+                    <div id="projectsContainer">
+                        <!-- Projects will be added here -->
+                    </div>
+                    <button type="button" class="btn-soft" id="addProject">+ Add Project</button>
+                </div>
+
+                <div class="form-section">
+                    <h3>Certifications & Achievements</h3>
+                    <div id="certificationsContainer">
+                        <!-- Certifications will be added here -->
+                    </div>
+                    <button type="button" class="btn-soft" id="addCertification">+ Add Certification</button>
+                </div>
+
+                <button type="submit" class="submit-button-enhanced">💾 Save Profile</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Load existing profile
+        async function loadProfile() {
+            const res = await fetch('/api/profile');
+            if (res.ok) {
+                const data = await res.json();
+                const profile = data.profile || {};
+                
+                document.getElementById('fullName').value = profile.fullName || '';
+                document.getElementById('bio').value = profile.bio || '';
+                document.getElementById('currentRole').value = profile.currentRole || '';
+                document.getElementById('targetRole').value = profile.targetRole || '';
+                document.getElementById('profileName').textContent = profile.fullName || 'Your Name';
+                document.getElementById('profileRole').textContent = `${profile.currentRole || 'Current Role'} → ${profile.targetRole || 'Target Role'}`;
+                
+                // Load portfolio
+                const portfolioRes = await fetch('/api/portfolio');
+                if (portfolioRes.ok) {
+                    const portfolioData = await portfolioRes.json();
+                    const portfolio = portfolioData.portfolio || {};
+                    
+                    if (portfolio.photo) {
+                        document.getElementById('photoPreview').innerHTML = `<img src="${portfolio.photo}" alt="Profile" />`;
+                    }
+                    
+                    // Load skills
+                    if (portfolio.skills) {
+                        portfolio.skills.forEach(skill => addSkill(skill));
+                    }
+                    
+                    // Load education
+                    if (portfolio.education) {
+                        portfolio.education.forEach(edu => addEducationEntry(edu));
+                    }
+                    
+                    // Load projects
+                    if (portfolio.projects) {
+                        portfolio.projects.forEach(project => addProjectEntry(project));
+                    }
+                    
+                    // Load certifications
+                    if (portfolio.certifications) {
+                        portfolio.certifications.forEach(cert => addCertificationEntry(cert));
+                    }
+                }
+            }
+        }
+
+        // Photo upload
+        document.getElementById('photoPreview').addEventListener('click', () => {
+            document.getElementById('photoUpload').click();
+        });
+
+        document.getElementById('photoUpload').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                // Convert to base64 for storage (in production, use proper file storage)
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    const base64 = event.target.result;
+                    document.getElementById('photoPreview').innerHTML = `<img src="${base64}" alt="Profile" />`;
+                    
+                    // Save to portfolio
+                    await fetch('/api/portfolio', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({photo: base64})
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Skills management
+        function addSkill(skill) {
+            const container = document.getElementById('skillsContainer');
+            const skillEl = document.createElement('div');
+            skillEl.className = 'skill-badge';
+            skillEl.innerHTML = `
+                <span>${skill}</span>
+                <button type="button" class="remove-btn" onclick="this.parentElement.remove()">×</button>
+            `;
+            container.appendChild(skillEl);
+        }
+
+        document.getElementById('newSkill').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const skill = e.target.value.trim();
+                if (skill) {
+                    addSkill(skill);
+                    e.target.value = '';
+                }
+            }
+        });
+
+        // Education management
+        function addEducationEntry(edu = {}) {
+            const container = document.getElementById('educationContainer');
+            const eduEl = document.createElement('div');
+            eduEl.className = 'education-entry';
+            eduEl.innerHTML = `
+                <input type="text" placeholder="Degree/Certificate" value="${edu.degree || ''}" class="form-input-enhanced" />
+                <input type="text" placeholder="Institution" value="${edu.institution || ''}" class="form-input-enhanced" />
+                <input type="text" placeholder="Year" value="${edu.year || ''}" class="form-input-enhanced" />
+                <button type="button" class="remove-btn" onclick="this.parentElement.remove()">×</button>
+            `;
+            container.appendChild(eduEl);
+        }
+
+        document.getElementById('addEducation').addEventListener('click', () => addEducationEntry());
+
+        // Projects management
+        function addProjectEntry(project = {}) {
+            const container = document.getElementById('projectsContainer');
+            const projEl = document.createElement('div');
+            projEl.className = 'project-entry';
+            projEl.innerHTML = `
+                <input type="text" placeholder="Project Name" value="${project.name || ''}" class="form-input-enhanced" />
+                <textarea placeholder="Description" class="form-input-enhanced" rows="2">${project.description || ''}</textarea>
+                <input type="text" placeholder="Link/URL" value="${project.link || ''}" class="form-input-enhanced" />
+                <button type="button" class="remove-btn" onclick="this.parentElement.remove()">×</button>
+            `;
+            container.appendChild(projEl);
+        }
+
+        document.getElementById('addProject').addEventListener('click', () => addProjectEntry());
+
+        // Certifications management
+        function addCertificationEntry(cert = {}) {
+            const container = document.getElementById('certificationsContainer');
+            const certEl = document.createElement('div');
+            certEl.className = 'certification-entry';
+            certEl.innerHTML = `
+                <input type="text" placeholder="Certification Name" value="${cert.name || ''}" class="form-input-enhanced" />
+                <input type="text" placeholder="Issuing Organization" value="${cert.organization || ''}" class="form-input-enhanced" />
+                <input type="text" placeholder="Year" value="${cert.year || ''}" class="form-input-enhanced" />
+                <input type="text" placeholder="Credential ID" value="${cert.credentialId || ''}" class="form-input-enhanced" />
+                <button type="button" class="remove-btn" onclick="this.parentElement.remove()">×</button>
+            `;
+            container.appendChild(certEl);
+        }
+
+        document.getElementById('addCertification').addEventListener('click', () => addCertificationEntry());
+
+        // Save profile
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const skills = Array.from(document.querySelectorAll('#skillsContainer .skill-badge span')).map(s => s.textContent);
+            
+            const education = Array.from(document.querySelectorAll('#educationContainer .education-entry')).map(edu => ({
+                degree: edu.children[0].value,
+                institution: edu.children[1].value,
+                year: edu.children[2].value
+            }));
+
+            const projects = Array.from(document.querySelectorAll('#projectsContainer .project-entry')).map(proj => ({
+                name: proj.children[0].value,
+                description: proj.children[1].value,
+                link: proj.children[2].value
+            }));
+
+            const certifications = Array.from(document.querySelectorAll('#certificationsContainer .certification-entry')).map(cert => ({
+                name: cert.children[0].value,
+                organization: cert.children[1].value,
+                year: cert.children[2].value,
+                credentialId: cert.children[3].value
+            }));
+
+            // Save profile
+            await fetch('/api/profile', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    profile: {
+                        fullName: document.getElementById('fullName').value,
+                        bio: document.getElementById('bio').value,
+                        currentRole: document.getElementById('currentRole').value,
+                        targetRole: document.getElementById('targetRole').value
+                    }
+                })
+            });
+
+            // Save portfolio
+            await fetch('/api/portfolio', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    skills, education, projects, certifications
+                })
+            });
+
+            alert('Profile saved successfully!');
+        });
+
+        // Generate public link
+        document.getElementById('generatePublicLink').addEventListener('click', async () => {
+            const res = await fetch('/api/generate-public-link');
+            if (res.ok) {
+                const data = await res.json();
+                const url = window.location.origin + data.url;
+                prompt('Your public profile link (copy this):', url);
+            }
+        });
+
+        // Load on page load
+        loadProfile();
+    </script>
+</body>
+</html>

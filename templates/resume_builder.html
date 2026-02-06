@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Resume Builder - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <img src="/static/images/logo.svg" alt="logo" class="logo" />
+            <h1>Virtual Career Counselor</h1>
+        </div>
+        <nav class="nav">
+            <a class="btn-soft" href="/">🏠 Home</a>
+            <a class="btn-soft" href="/dashboard">📊 Dashboard</a>
+            <a class="btn-soft" href="/career-explore">🔍 Explore</a>
+            <a class="btn-soft" href="/courses">📚 Courses</a>
+            <a class="btn-soft" href="/job-insights">💼 Jobs</a>
+            <a class="btn-soft" href="/profile">👤 Profile</a>
+            <a class="btn-soft" href="/resume-builder">📄 Resume</a>
+            <a class="btn-soft" href="/interview-prep">🎤 Interview</a>
+            <a class="btn-soft" href="/career-match">🎯 Match</a>
+            <a class="btn-soft" href="/analytics">📊 Analytics</a>
+            <a class="btn-soft" href="/saved-jobs">🔖 Saved</a>
+            <a class="btn-soft" href="/settings">⚙️ Settings</a>
+            <details class="nav-more">
+                <summary class="btn-soft">✨ More</summary>
+                <div class="nav-more-menu">
+                    <a class="btn-soft" href="/salary-negotiation">💰 Salary</a>
+                    <a class="btn-soft" href="/company-insights">🏢 Companies</a>
+                    <a class="btn-soft" href="/mentors">👥 Mentors</a>
+                    <a class="btn-soft" href="/forum">💬 Forum</a>
+                    <a class="btn-soft" href="/learning-paths">📚 Paths</a>
+                    <a class="btn-soft" href="/referrals">🤝 Refer</a>
+                    <a class="btn-soft" href="/connections">🤝 Connections</a>
+                    <a class="btn-soft" href="/leaderboard">🏆 Leaderboard</a>
+                </div>
+            </details>
+            <a class="btn-soft" href="/logout">🚪 Logout</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>📄 Resume Builder</h2>
+            <p>Create professional resumes with AI-powered suggestions</p>
+
+            <div class="resume-templates">
+                <h3>Choose Template</h3>
+                <div class="template-grid">
+                    <div class="template-card" data-template="modern">
+                        <div class="template-preview">Modern</div>
+                        <button class="btn-soft select-template">Select</button>
+                    </div>
+                    <div class="template-card" data-template="classic">
+                        <div class="template-preview">Classic</div>
+                        <button class="btn-soft select-template">Select</button>
+                    </div>
+                    <div class="template-card" data-template="creative">
+                        <div class="template-preview">Creative</div>
+                        <button class="btn-soft select-template">Select</button>
+                    </div>
+                </div>
+            </div>
+
+            <form id="resumeForm" class="enhanced-form" style="display:none">
+                <input type="hidden" id="selectedTemplate" value="modern" />
+                <input type="text" id="resumeName" placeholder="Resume Name" class="form-input-enhanced" />
+
+                <div class="form-section">
+                    <h3>Personal Information</h3>
+                    <div class="form-row">
+                        <input type="text" id="resumeFullName" placeholder="Full Name" class="form-input-enhanced" />
+                        <input type="email" id="resumeEmail" placeholder="Email" class="form-input-enhanced" />
+                        <input type="tel" id="resumePhone" placeholder="Phone" class="form-input-enhanced" />
+                    </div>
+                    <input type="text" id="resumeLocation" placeholder="Location" class="form-input-enhanced" />
+                    <textarea id="resumeSummary" placeholder="Professional Summary" class="form-input-enhanced" rows="3"></textarea>
+                </div>
+
+                <div class="form-section">
+                    <h3>Work Experience</h3>
+                    <div id="experienceContainer"></div>
+                    <button type="button" class="btn-soft" id="addExperience">+ Add Experience</button>
+                </div>
+
+                <div class="form-section">
+                    <h3>Education</h3>
+                    <div id="resumeEducationContainer"></div>
+                    <button type="button" class="btn-soft" id="addResumeEducation">+ Add Education</button>
+                </div>
+
+                <div class="form-section">
+                    <h3>Skills</h3>
+                    <textarea id="resumeSkills" placeholder="List your skills (comma-separated)" class="form-input-enhanced" rows="2"></textarea>
+                </div>
+
+                <div class="form-section">
+                    <h3>Certifications</h3>
+                    <div id="resumeCertificationsContainer"></div>
+                    <button type="button" class="btn-soft" id="addResumeCertification">+ Add Certification</button>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="submit-button-enhanced">💾 Save Resume</button>
+                    <button type="button" class="btn-soft" id="previewResume">👁️ Preview</button>
+                    <button type="button" class="btn-soft" id="exportResume">📥 Export PDF</button>
+                </div>
+            </form>
+
+            <div id="resumePreview" style="display:none" class="resume-preview">
+                <h3>Resume Preview</h3>
+                <div id="previewContent" class="preview-content"></div>
+                <button class="btn-soft" onclick="document.getElementById('resumePreview').style.display='none'">Close Preview</button>
+            </div>
+
+            <div class="saved-resumes">
+                <h3>My Saved Resumes</h3>
+                <div id="resumesList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentResumeId = null;
+
+        // Load user profile data
+        async function loadProfileData() {
+            const res = await fetch('/api/profile');
+            if (res.ok) {
+                const data = await res.json();
+                const profile = data.profile || {};
+                
+                document.getElementById('resumeFullName').value = profile.fullName || '';
+                document.getElementById('resumeEmail').value = profile.email || '';
+                document.getElementById('resumeSummary').value = profile.bio || '';
+                
+                // Load portfolio for skills
+                const portfolioRes = await fetch('/api/portfolio');
+                if (portfolioRes.ok) {
+                    const portfolioData = await portfolioRes.json();
+                    const portfolio = portfolioData.portfolio || {};
+                    if (portfolio.skills) {
+                        document.getElementById('resumeSkills').value = portfolio.skills.join(', ');
+                    }
+                }
+            }
+        }
+
+        // Template selection
+        document.querySelectorAll('.select-template').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const template = btn.closest('.template-card').dataset.template;
+                document.getElementById('selectedTemplate').value = template;
+                document.getElementById('resumeForm').style.display = 'block';
+                document.querySelector('.resume-templates').style.display = 'none';
+                loadProfileData();
+            });
+        });
+
+        // Experience management
+        function addExperienceEntry(exp = {}) {
+            const container = document.getElementById('experienceContainer');
+            const expEl = document.createElement('div');
+            expEl.className = 'experience-entry';
+            expEl.innerHTML = `
+                <input type="text" placeholder="Job Title" value="${exp.title || ''}" class="form-input-enhanced" />
+                <input type="text" placeholder="Company" value="${exp.company || ''}" class="form-input-enhanced" />
+                <input type="text" placeholder="Duration (e.g., Jan 2020 - Present)" value="${exp.duration || ''}" class="form-input-enhanced" />
+                <textarea placeholder="Description" class="form-input-enhanced" rows="2">${exp.description || ''}</textarea>
+                <button type="button" class="remove-btn" onclick="this.parentElement.remove()">×</button>
+            `;
+            container.appendChild(expEl);
+        }
+
+        document.getElementById('addExperience').addEventListener('click', () => addExperienceEntry());
+
+        // Education management
+        function addResumeEducationEntry(edu = {}) {
+            const container = document.getElementById('resumeEducationContainer');
+            const eduEl = document.createElement('div');
+            eduEl.className = 'education-entry';
+            eduEl.innerHTML = `
+                <input type="text" placeholder="Degree" value="${edu.degree || ''}" class="form-input-enhanced" />
+                <input type="text" placeholder="Institution" value="${edu.institution || ''}" class="form-input-enhanced" />
+                <input type="text" placeholder="Year" value="${edu.year || ''}" class="form-input-enhanced" />
+                <button type="button" class="remove-btn" onclick="this.parentElement.remove()">×</button>
+            `;
+            container.appendChild(eduEl);
+        }
+
+        document.getElementById('addResumeEducation').addEventListener('click', () => addResumeEducationEntry());
+
+        // Certification management
+        function addResumeCertificationEntry(cert = {}) {
+            const container = document.getElementById('resumeCertificationsContainer');
+            const certEl = document.createElement('div');
+            certEl.className = 'certification-entry';
+            certEl.innerHTML = `
+                <input type="text" placeholder="Certification Name" value="${cert.name || ''}" class="form-input-enhanced" />
+                <input type="text" placeholder="Issuing Organization" value="${cert.organization || ''}" class="form-input-enhanced" />
+                <input type="text" placeholder="Year" value="${cert.year || ''}" class="form-input-enhanced" />
+                <button type="button" class="remove-btn" onclick="this.parentElement.remove()">×</button>
+            `;
+            container.appendChild(certEl);
+        }
+
+        document.getElementById('addResumeCertification').addEventListener('click', () => addResumeCertificationEntry());
+
+        // Save resume
+        document.getElementById('resumeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const experience = Array.from(document.querySelectorAll('#experienceContainer .experience-entry')).map(exp => ({
+                title: exp.children[0].value,
+                company: exp.children[1].value,
+                duration: exp.children[2].value,
+                description: exp.children[3].value
+            }));
+
+            const education = Array.from(document.querySelectorAll('#resumeEducationContainer .education-entry')).map(edu => ({
+                degree: edu.children[0].value,
+                institution: edu.children[1].value,
+                year: edu.children[2].value
+            }));
+
+            const certifications = Array.from(document.querySelectorAll('#resumeCertificationsContainer .certification-entry')).map(cert => ({
+                name: cert.children[0].value,
+                organization: cert.children[1].value,
+                year: cert.children[2].value
+            }));
+
+            const resumeData = {
+                name: document.getElementById('resumeName').value || 'My Resume',
+                template: document.getElementById('selectedTemplate').value,
+                sections: {
+                    personal: {
+                        fullName: document.getElementById('resumeFullName').value,
+                        email: document.getElementById('resumeEmail').value,
+                        phone: document.getElementById('resumePhone').value,
+                        location: document.getElementById('resumeLocation').value,
+                        summary: document.getElementById('resumeSummary').value
+                    },
+                    experience,
+                    education,
+                    skills: document.getElementById('resumeSkills').value.split(',').map(s => s.trim()),
+                    certifications
+                }
+            };
+
+            const res = await fetch('/api/resumes', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(resumeData)
+            });
+
+            if (res.ok) {
+                alert('Resume saved successfully!');
+                loadResumes();
+            }
+        });
+
+        // Preview resume
+        document.getElementById('previewResume').addEventListener('click', () => {
+            const preview = document.getElementById('previewContent');
+            const template = document.getElementById('selectedTemplate').value;
+            
+            preview.innerHTML = `
+                <div class="resume-preview-${template}">
+                    <h2>${document.getElementById('resumeFullName').value || 'Your Name'}</h2>
+                    <p>${document.getElementById('resumeEmail').value || ''} | ${document.getElementById('resumePhone').value || ''} | ${document.getElementById('resumeLocation').value || ''}</p>
+                    <h3>Summary</h3>
+                    <p>${document.getElementById('resumeSummary').value || ''}</p>
+                    <h3>Experience</h3>
+                    ${Array.from(document.querySelectorAll('#experienceContainer .experience-entry')).map(exp => `
+                        <div>
+                            <strong>${exp.children[0].value}</strong> - ${exp.children[1].value} (${exp.children[2].value})
+                            <p>${exp.children[3].value}</p>
+                        </div>
+                    `).join('')}
+                    <h3>Education</h3>
+                    ${Array.from(document.querySelectorAll('#resumeEducationContainer .education-entry')).map(edu => `
+                        <div>${edu.children[0].value} - ${edu.children[1].value} (${edu.children[2].value})</div>
+                    `).join('')}
+                    <h3>Skills</h3>
+                    <p>${document.getElementById('resumeSkills').value || ''}</p>
+                </div>
+            `;
+            
+            document.getElementById('resumePreview').style.display = 'block';
+        });
+
+        // Export resume
+        document.getElementById('exportResume').addEventListener('click', () => {
+            alert('PDF export feature - Use browser print (Ctrl+P) and save as PDF');
+            window.print();
+        });
+
+        // Load saved resumes
+        async function loadResumes() {
+            const res = await fetch('/api/resumes');
+            if (res.ok) {
+                const data = await res.json();
+                const resumes = data.resumes || [];
+                const list = document.getElementById('resumesList');
+                
+                if (resumes.length === 0) {
+                    list.innerHTML = '<p>No saved resumes yet.</p>';
+                } else {
+                    list.innerHTML = resumes.map(r => `
+                        <div class="resume-item">
+                            <h4>${r.name}</h4>
+                            <p>Template: ${r.template} | Created: ${new Date(r.createdAt).toLocaleDateString()}</p>
+                            <button class="btn-soft" onclick="loadResume('${r.resumeId}')">Edit</button>
+                            <button class="btn-soft" onclick="deleteResume('${r.resumeId}')">Delete</button>
+                        </div>
+                    `).join('');
+                }
+            }
+        }
+
+        window.loadResume = async (resumeId) => {
+            const res = await fetch(`/api/resumes/${resumeId}`);
+            if (res.ok) {
+                const data = await res.json();
+                const resume = data.resume;
+                // Load resume data into form
+                currentResumeId = resumeId;
+                document.getElementById('resumeName').value = resume.name;
+                document.getElementById('selectedTemplate').value = resume.template;
+                // ... load other fields
+                document.getElementById('resumeForm').style.display = 'block';
+            }
+        };
+
+        window.deleteResume = async (resumeId) => {
+            if (confirm('Delete this resume?')) {
+                const res = await fetch(`/api/resumes/${resumeId}`, {method: 'DELETE'});
+                if (res.ok) {
+                    loadResumes();
+                }
+            }
+        };
+
+        loadResumes();
+    </script>
+</body>
+</html>

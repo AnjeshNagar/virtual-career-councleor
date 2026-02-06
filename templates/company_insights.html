@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Company Insights - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="/static/dark-mode.js" defer></script>
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <img src="/static/images/logo.svg" alt="logo" class="logo" />
+            <h1>Virtual Career Counselor</h1>
+        </div>
+        <nav class="nav">
+            <a class="btn-soft" href="/">🏠 Home</a>
+            <a class="btn-soft" href="/dashboard">📊 Dashboard</a>
+            <a class="btn-soft" href="/job-insights">💼 Jobs</a>
+            <a class="btn-soft" href="/logout">🚪 Logout</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>🏢 Company Insights</h2>
+            <p>Research companies, read reviews, and make informed decisions</p>
+
+            <div class="search-section">
+                <input type="text" id="companySearch" class="form-input-enhanced" placeholder="Enter company name..." />
+                <button class="btn-soft" id="searchCompany">Search</button>
+            </div>
+
+            <div id="companyInsights" style="display:none">
+                <div id="insightsContent"></div>
+                
+                <div class="reviews-section">
+                    <h3>Reviews</h3>
+                    <div id="reviewsList"></div>
+                </div>
+
+                <button class="btn-soft" id="addReviewBtn">+ Add Review</button>
+            </div>
+
+            <div id="reviewForm" style="display:none" class="review-form">
+                <h3>Add Company Review</h3>
+                <form id="reviewFormElement">
+                    <input type="hidden" id="reviewCompanyName" />
+                    <div class="form-group-enhanced">
+                        <label>Rating (1-5)</label>
+                        <select id="reviewRating" class="form-input-enhanced" required>
+                            <option value="5">5 - Excellent</option>
+                            <option value="4">4 - Very Good</option>
+                            <option value="3">3 - Good</option>
+                            <option value="2">2 - Fair</option>
+                            <option value="1">1 - Poor</option>
+                        </select>
+                    </div>
+                    <div class="form-group-enhanced">
+                        <label>Pros (comma-separated)</label>
+                        <input type="text" id="reviewPros" class="form-input-enhanced" placeholder="e.g., Great culture, Good benefits" />
+                    </div>
+                    <div class="form-group-enhanced">
+                        <label>Cons (comma-separated)</label>
+                        <input type="text" id="reviewCons" class="form-input-enhanced" placeholder="e.g., Long hours, Limited growth" />
+                    </div>
+                    <div class="form-group-enhanced">
+                        <label>Company Culture</label>
+                        <textarea id="reviewCulture" class="form-input-enhanced" rows="3"></textarea>
+                    </div>
+                    <div class="form-group-enhanced">
+                        <label>Work-Life Balance</label>
+                        <textarea id="reviewWorkLife" class="form-input-enhanced" rows="2"></textarea>
+                    </div>
+                    <div class="form-group-enhanced">
+                        <label>Interview Experience</label>
+                        <textarea id="reviewInterview" class="form-input-enhanced" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="submit-button-enhanced">Submit Review</button>
+                    <button type="button" class="btn-soft" onclick="document.getElementById('reviewForm').style.display='none'">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('searchCompany').addEventListener('click', async () => {
+            const companyName = document.getElementById('companySearch').value.trim();
+            if (!companyName) {
+                alert('Please enter a company name');
+                return;
+            }
+
+            const res = await fetch(`/api/company-insights/${encodeURIComponent(companyName)}`);
+            if (res.ok) {
+                const data = await res.json();
+                const insights = data.insights || {};
+                
+                document.getElementById('insightsContent').innerHTML = `
+                    <div class="company-header">
+                        <h3>${insights.companyName || companyName}</h3>
+                        <div class="company-rating">
+                            <span class="rating-value">${insights.averageRating || 0}/5</span>
+                            <span class="rating-stars">${'⭐'.repeat(Math.round(insights.averageRating || 0))}</span>
+                            <span class="review-count">(${insights.totalReviews || 0} reviews)</span>
+                        </div>
+                    </div>
+
+                    ${insights.commonPros && insights.commonPros.length > 0 ? `
+                        <div class="pros-cons">
+                            <h4>✅ Common Pros</h4>
+                            <ul>
+                                ${insights.commonPros.map(p => `<li>${p}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+
+                    ${insights.commonCons && insights.commonCons.length > 0 ? `
+                        <div class="pros-cons">
+                            <h4>❌ Common Cons</h4>
+                            <ul>
+                                ${insights.commonCons.map(c => `<li>${c}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                `;
+
+                // Display reviews
+                const reviews = insights.reviews || [];
+                if (reviews.length > 0) {
+                    document.getElementById('reviewsList').innerHTML = reviews.map(r => `
+                        <div class="review-item">
+                            <div class="review-header">
+                                <strong>${r.author || 'Anonymous'}</strong>
+                                <span class="review-rating">${'⭐'.repeat(r.rating)}</span>
+                                <span class="review-date">${new Date(r.createdAt).toLocaleDateString()}</span>
+                            </div>
+                            ${r.pros && r.pros.length > 0 ? `<div><strong>Pros:</strong> ${r.pros.join(', ')}</div>` : ''}
+                            ${r.cons && r.cons.length > 0 ? `<div><strong>Cons:</strong> ${r.cons.join(', ')}</div>` : ''}
+                            ${r.culture ? `<div><strong>Culture:</strong> ${r.culture}</div>` : ''}
+                            ${r.workLifeBalance ? `<div><strong>Work-Life Balance:</strong> ${r.workLifeBalance}</div>` : ''}
+                            ${r.interviewExperience ? `<div><strong>Interview Experience:</strong> ${r.interviewExperience}</div>` : ''}
+                        </div>
+                    `).join('');
+                } else {
+                    document.getElementById('reviewsList').innerHTML = '<p class="muted">No reviews yet. Be the first to review!</p>';
+                }
+
+                document.getElementById('reviewCompanyName').value = companyName;
+                document.getElementById('companyInsights').style.display = 'block';
+            }
+        });
+
+        document.getElementById('addReviewBtn').addEventListener('click', () => {
+            document.getElementById('reviewForm').style.display = 'block';
+        });
+
+        document.getElementById('reviewFormElement').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const companyName = document.getElementById('reviewCompanyName').value;
+            const reviewData = {
+                rating: parseInt(document.getElementById('reviewRating').value),
+                pros: document.getElementById('reviewPros').value.split(',').map(s => s.trim()).filter(s => s),
+                cons: document.getElementById('reviewCons').value.split(',').map(s => s.trim()).filter(s => s),
+                culture: document.getElementById('reviewCulture').value,
+                workLifeBalance: document.getElementById('reviewWorkLife').value,
+                interviewExperience: document.getElementById('reviewInterview').value
+            };
+
+            const res = await fetch('/api/company-reviews', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({companyName, review: reviewData})
+            });
+
+            if (res.ok) {
+                alert('Review submitted!');
+                document.getElementById('reviewForm').style.display = 'none';
+                document.getElementById('reviewFormElement').reset();
+                document.getElementById('searchCompany').click(); // Refresh
+            }
+        });
+    </script>
+</body>
+</html>

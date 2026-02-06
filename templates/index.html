@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Virtual Career Counselor - Demo</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="/static/dark-mode.js" defer></script>
+    <!-- <script src="/static/navbar.js" defer></script> -->
+    <script>
+      // Simple dropdown test - dropdown appears outside navbar
+      document.addEventListener('DOMContentLoaded', function() {
+        const testDropdown = document.querySelector('div[style*="position: relative; display: inline-block;"]');
+        const dropdownMenu = document.getElementById('testDropdown');
+        
+        if (testDropdown && dropdownMenu) {
+          // Move dropdown to body to escape navbar container
+          document.body.appendChild(dropdownMenu);
+          
+          testDropdown.addEventListener('mouseenter', function(e) {
+            const buttonRect = this.getBoundingClientRect();
+            dropdownMenu.style.display = 'block';
+            dropdownMenu.style.position = 'fixed';
+            dropdownMenu.style.top = (buttonRect.bottom + window.scrollY + 5) + 'px';
+            dropdownMenu.style.left = (buttonRect.left + window.scrollX) + 'px';
+            dropdownMenu.style.zIndex = '999999';
+          });
+          
+          testDropdown.addEventListener('mouseleave', function(e) {
+            setTimeout(() => {
+              if (!dropdownMenu.matches(':hover')) {
+                dropdownMenu.style.display = 'none';
+              }
+            }, 200);
+          });
+          
+          dropdownMenu.addEventListener('mouseleave', function() {
+            this.style.display = 'none';
+          });
+          
+          dropdownMenu.addEventListener('mouseenter', function() {
+            this.style.display = 'block';
+          });
+        }
+      });
+    </script>
+  </head>
+  <body class="homepage-body">
+    <!-- Animated Background Elements -->
+    <div class="homepage-bg-animation">
+      <div class="bg-orb orb-1"></div>
+      <div class="bg-orb orb-2"></div>
+      <div class="bg-orb orb-3"></div>
+      <div class="bg-orb orb-4"></div>
+    </div>
+
+    <header class="topbar enhanced-topbar">
+      <div class="brand">
+        <div class="logo-wrapper">
+          <img src="/static/images/logo.svg" alt="logo" class="logo" />
+        </div>
+        <h1>Virtual Career Counselor</h1>
+      </div>
+      
+      <!-- Mobile Menu Toggle -->
+      <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="nav" id="mainNav">
+        <a class="nav-link" href="/">🏠 Home</a>
+        <a class="nav-link" href="/dashboard">📊 Dashboard</a>
+        
+        <!-- TEST Dropdown - Always visible -->
+        <div style="position: relative; display: inline-block; overflow: visible !important; z-index: 99999;">
+          <button style="background: rgba(255, 255, 255, 0.95); color: #3730a3; padding: 8px 12px; border-radius: 6px; font-weight: 500; font-size: 13px; border: 1px solid rgba(102, 126, 234, 0.2); cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">🧪 Test ▼</button>
+          <div id="testDropdown" style="display: none; position: fixed; top: auto; left: auto; min-width: 220px; background: white; border: 2px solid #667eea; border-radius: 8px; box-shadow: 0 15px 40px rgba(0,0,0,0.4); z-index: 999999; padding: 15px 0; margin: 0; transform: none !important;">
+            <a href="/career-explore" style="display: block; padding: 15px 25px; color: #333; text-decoration: none; font-size: 15px; border-bottom: 1px solid #eee; font-weight: 500;">🔍 Test Item 1</a>
+            <a href="/career-match" style="display: block; padding: 15px 25px; color: #333; text-decoration: none; font-size: 15px; border-bottom: 1px solid #eee; font-weight: 500;">🎯 Test Item 2</a>
+            <a href="/learning-paths" style="display: block; padding: 15px 25px; color: #333; text-decoration: none; font-size: 15px; font-weight: 500;">📚 Test Item 3</a>
+          </div>
+        </div>
+        
+        {% if is_logged_in %}
+        <!-- Career Development Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">🚀 Career</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/career-explore">🔍 Explore Careers</a>
+            <a class="dropdown-item" href="/career-match">🎯 Career Match</a>
+            <a class="dropdown-item" href="/learning-paths">📚 Learning Paths</a>
+            <a class="dropdown-item" href="/analytics">📊 Career Analytics</a>
+          </div>
+        </div>
+
+        <!-- Learning & Skills Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">📚 Learning</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/courses">📖 Courses</a>
+            <a class="dropdown-item" href="/resume-builder">📄 Resume Builder</a>
+            <a class="dropdown-item" href="/interview-prep">🎤 Interview Prep</a>
+            <a class="dropdown-item" href="/salary-negotiation">💰 Salary Negotiation</a>
+          </div>
+        </div>
+
+        <!-- Jobs & Network Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">💼 Jobs</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/job-insights">🔍 Job Insights</a>
+            <a class="dropdown-item" href="/saved-jobs">🔖 Saved Jobs</a>
+            <a class="dropdown-item" href="/company-insights">🏢 Companies</a>
+            <a class="dropdown-item" href="/referrals">🤝 Referrals</a>
+          </div>
+        </div>
+
+        <!-- Community Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">👥 Community</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/mentors">👨‍🏫 Mentors</a>
+            <a class="dropdown-item" href="/forum">💬 Forum</a>
+            <a class="dropdown-item" href="/connections">🤝 Connections</a>
+            <a class="dropdown-item" href="/leaderboard">🏆 Leaderboard</a>
+          </div>
+        </div>
+
+        <!-- Profile & Settings -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">👤 Account</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/profile">👤 Profile</a>
+            <a class="dropdown-item" href="/settings">⚙️ Settings</a>
+            <a class="dropdown-item" href="/logout">🚪 Logout</a>
+          </div>
+        </div>
+        
+        {% else %}
+        <a class="nav-link" href="/signup">✨ Sign up</a>
+        <a class="nav-link" href="/login">🔐 Login</a>
+        {% endif %}
+      </nav>
+    </header>
+
+    <div class="container homepage-container">
+      <!-- Enhanced Hero Section -->
+      <div class="hero enhanced-hero">
+        <div class="hero-image-wrapper">
+          <img src="/static/images/hero.svg" alt="career" class="hero-img" />
+          <div class="hero-decoration"></div>
+        </div>
+        <div class="hero-copy">
+          <div class="hero-badge">🚀 AI-Powered Career Guidance</div>
+          <h2 class="hero-title">Personalized Roadmaps for Every Career</h2>
+          <p class="hero-description">Enter your profile and goals — get taskable learning steps and real-time guidance powered by AI.</p>
+          <div class="hero-features">
+            <div class="feature-badge">✨ Personalized</div>
+            <div class="feature-badge">🎯 Goal-Oriented</div>
+            <div class="feature-badge">📈 Progress Tracking</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Enhanced Profile Section -->
+      <section class="card enhanced-card profile-card">
+        <div class="section-header">
+          <div class="section-icon">👤</div>
+          <h2 class="section-title">Create Your Profile</h2>
+          <p class="section-subtitle">Tell us about yourself to get personalized career guidance</p>
+        </div>
+        <form id="profile-form" class="enhanced-form">
+          <div class="form-row">
+            <div class="form-group-enhanced">
+              <label class="form-label-enhanced">
+                <span class="label-icon">👋</span>
+                <span class="label-text">Full Name</span>
+              </label>
+              <input id="name" name="name" type="text" required class="form-input-enhanced" placeholder="Enter your full name" />
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group-enhanced">
+              <label class="form-label-enhanced">
+                <span class="label-icon">💼</span>
+                <span class="label-text">Current Role</span>
+              </label>
+              <input id="currentRole" name="currentRole" type="text" class="form-input-enhanced" placeholder="e.g., Student, Software Developer" />
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group-enhanced">
+              <label class="form-label-enhanced">
+                <span class="label-icon">🎯</span>
+                <span class="label-text">Target Role / Profession</span>
+              </label>
+              <input id="targetRole" name="targetRole" type="text" required class="form-input-enhanced" placeholder="e.g., Teacher, Software Engineer, Data Analyst" />
+            </div>
+          </div>
+          
+          <div class="checkbox-row-enhanced">
+            <input type="checkbox" id="terms" class="checkbox-enhanced" />
+            <label for="terms" class="checkbox-label-enhanced">
+              <span>I agree to the</span>
+              <a href="#" class="terms-link">Terms &amp; Conditions</a>
+            </label>
+          </div> 
+          
+          <div id="profile-error" class="error-message"></div>
+          
+          <button type="submit" class="submit-button-enhanced">
+            <span class="button-icon">💾</span>
+            <span class="button-text">Save Profile & Get Started</span>
+            <span class="button-arrow">→</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- Enhanced Activities Section -->
+      <section class="card enhanced-card activities-card" id="activities-section" style="display:none">
+        <div class="section-header">
+          <div class="section-icon">📚</div>
+          <h2 class="section-title">Your Suggested Activities & Quizzes</h2>
+          <p class="section-subtitle">Complete these profession-specific quizzes to build skills. Scoring 70% or above marks them complete.</p>
+        </div>
+        <div id="activitiesRoot">
+          <div class="activity-section" data-level="basic">
+            <h3>Basic Level</h3>
+            <div class="activity-list"></div>
+          </div>
+          <div class="activity-section" data-level="intermediate">
+            <h3>Intermediate Level</h3>
+            <div class="activity-list"></div>
+          </div>
+          <div class="activity-section" data-level="advanced">
+            <h3>Advanced Level</h3>
+            <div class="activity-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quiz Modal -->
+      <div id="quizModal" class="quiz-modal" style="display:none">
+        <div class="quiz-modal-content">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <h2 id="quizTitle"></h2>
+            <button id="closeQuizBtn" style="background:none;border:none;font-size:24px;cursor:pointer">✕</button>
+          </div>
+          <div id="quizInfo" style="background:#eef2ff;padding:8px;border-radius:8px;margin-bottom:12px;font-size:12px"></div>
+          <form id="quizForm">
+            <div id="quizQuestions"></div>
+            <button type="button" id="submitQuizBtn">Submit Quiz</button>
+          </form>
+          <div id="quizResult" style="display:none;margin-top:12px"></div>
+        </div>
+      </div>
+
+      <!-- Enhanced Roadmap Section -->
+      <section class="card enhanced-card roadmap-card">
+        <div class="section-header">
+          <div class="section-icon">🗺️</div>
+          <h2 class="section-title">Generate Your Career Roadmap</h2>
+          <p class="section-subtitle">Get a personalized step-by-step guide to achieve your career goals</p>
+        </div>
+        <div class="roadmap-form-wrapper">
+          <div class="form-group-enhanced">
+            <label class="form-label-enhanced">
+              <span class="label-icon">🎯</span>
+              <span class="label-text">Career Goal</span>
+            </label>
+            <input id="goalInput" type="text" class="form-input-enhanced" placeholder="e.g. Data Analyst, Software Engineer, Teacher" />
+          </div>
+          <div class="form-group-enhanced">
+            <label class="form-label-enhanced">
+              <span class="label-icon">📄</span>
+              <span class="label-text">Output Format</span>
+            </label>
+            <select id="formatSelect" class="form-select-enhanced">
+              <option value="both">Both (text + code)</option>
+              <option value="text">Text only</option>
+              <option value="code">Code format</option>
+            </select>
+          </div>
+          <button id="generateBtn" class="generate-button-enhanced">
+            <span class="button-icon">✨</span>
+            <span class="button-text">Generate Roadmap</span>
+            <span class="button-arrow">→</span>
+          </button>
+        </div>
+        <div id="roadmapContainer" class="roadmap-container-enhanced"></div>
+      </section>
+
+      <!-- Enhanced Chat Section -->
+      <section class="card enhanced-card chat-card">
+        <div class="section-header">
+          <div class="section-icon">💬</div>
+          <h2 class="section-title">Chat with Career Counselor</h2>
+          <p class="section-subtitle">Ask any career-related questions and get instant AI-powered guidance</p>
+        </div>
+        <div id="chat" class="chat-window-enhanced"></div>
+        <div class="chat-input-wrapper">
+          <input id="chatInput" type="text" class="chat-input-enhanced" placeholder="Ask career questions... (e.g., How to become a data analyst?)" />
+          <button id="sendChat" class="chat-send-button">
+            <span>Send</span>
+            <span class="send-icon">📤</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Enhanced Footer -->
+      <footer class="site-footer-enhanced">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>Virtual Career Counselor</h3>
+            <p>Your AI-powered career guidance platform</p>
+          </div>
+          <div class="footer-section">
+            <h4>Quick Links</h4>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/login">Login</a>
+            <a href="/signup">Sign Up</a>
+          </div>
+          <div class="footer-section">
+            <h4>Features</h4>
+            <p>✨ AI-Powered Guidance</p>
+            <p>📊 Personalized Roadmaps</p>
+            <p>🎯 Skill Assessments</p>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>© 2026 Virtual Career Counselor. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+// Clear localStorage on logout to prevent data mixing between users
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('logout') === '1') {
+  localStorage.removeItem('vcc_user');
+  // Clear any other user-specific localStorage data
+  Object.keys(localStorage).forEach(key => {
+    if (key.startsWith('vcc_')) {
+      localStorage.removeItem(key);
+    }
+  });
+}
+
+// Load saved profile + activities when user returns to homepage
+async function hydrateHomeFromServer() {
+  try {
+    const res = await fetch('/api/profile');
+    if (!res.ok) return;
+    const data = await res.json();
+    const profile = (data && data.profile) ? data.profile : {};
+
+    // Support both legacy keys and current keys
+    const fullName = profile.fullName || profile.name || '';
+    const currentRole = profile.currentRole || '';
+    const targetRole = profile.targetRole || profile.role || profile.target || '';
+
+    if (fullName) document.getElementById('name').value = fullName;
+    if (currentRole) document.getElementById('currentRole').value = currentRole;
+    if (targetRole) document.getElementById('targetRole').value = targetRole;
+
+    // If a profile exists, show activities immediately
+    if (fullName || targetRole) {
+      document.getElementById('activities-section').style.display = 'block';
+      await loadActivities();
+    }
+  } catch (e) {
+    // ignore
+  }
+}
+
+// Fetch and display activities for the logged-in user
+async function loadActivities() {
+  const res = await fetch('/api/activities');
+  if (!res.ok) return;
+  const data = await res.json();
+  const activities = data.activities || [];
+  const sections = {
+    basic: document.querySelector('[data-level="basic"] .activity-list'),
+    intermediate: document.querySelector('[data-level="intermediate"] .activity-list'),
+    advanced: document.querySelector('[data-level="advanced"] .activity-list')
+  };
+  for (const k of Object.keys(sections)) sections[k].innerHTML = '';
+  
+  activities.forEach(a => {
+    const el = document.createElement('div');
+    el.className = 'activity-row';
+    const status = a.status === 'completed' ? `<span style="color:#10b981">✔ Completed - Score: ${a.lastScore || 'N/A'}%</span>` : `<button type="button" class="start-btn start-quiz-btn" data-activity-id="${a.activityId}">Start Quiz</button>`;
+    el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;width:100%"><div><strong>${a.title}</strong><div class="muted">${a.detail || ''}</div><div class="muted" style="font-size:12px">Role: ${a.role || 'General'}</div></div><div>${status}</div></div>`;
+    const level = (a.level || 'basic').toLowerCase();
+    (sections[level] || sections.basic).appendChild(el);
+  });
+
+  // Attach event listeners to Start Quiz buttons
+  document.querySelectorAll('.start-quiz-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const activityId = btn.getAttribute('data-activity-id');
+      await showQuizModal(activityId);
+    });
+  });
+}
+
+// Show quiz in modal
+async function showQuizModal(activityId) {
+  const res = await fetch(`/api/quiz/${activityId}`);
+  if (!res.ok) { alert('Quiz not found'); return; }
+  const data = await res.json();
+  const activity = data.activity;
+  const quiz = data.quiz;
+  
+  document.getElementById('quizTitle').textContent = quiz.title;
+  const role = activity.role || 'General';
+  const level = activity.level || 'Basic';
+  document.getElementById('quizInfo').innerHTML = `<strong>${activity.title}</strong> — Level: <span style="color:#7c3aed">${level}</span> — Profession: <span style="color:#10b981">${role}</span>`;
+  
+  const questionsDiv = document.getElementById('quizQuestions');
+  questionsDiv.innerHTML = '';
+  
+  (quiz.questions || []).forEach((q, idx) => {
+    const qDiv = document.createElement('div');
+    qDiv.style.cssText = 'margin-bottom:16px;padding:12px;background:#fbfdff;border-radius:8px;border-left:4px solid #7c3aed';
+    qDiv.innerHTML = `<p><strong>Question ${idx+1}: ${q.text}</strong></p>`;
+    
+    (q.choices || []).forEach((choice, cidx) => {
+      const label = document.createElement('label');
+      label.style.cssText = 'display:block;margin:6px 0;cursor:pointer';
+      label.innerHTML = `<input type="radio" name="${q.id}" value="${cidx}" required> ${choice}`;
+      qDiv.appendChild(label);
+    });
+    
+    questionsDiv.appendChild(qDiv);
+  });
+  
+  document.getElementById('quizForm').dataset.activityId = activityId;
+  document.getElementById('quizResult').style.display = 'none';
+  document.getElementById('quizForm').style.display = 'block';
+  document.getElementById('submitQuizBtn').style.display = 'inline-block';
+  document.getElementById('quizModal').style.display = 'block';
+  document.getElementById('quizModal').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Close quiz modal
+document.getElementById('closeQuizBtn').addEventListener('click', () => {
+  document.getElementById('quizModal').style.display = 'none';
+  document.getElementById('quizForm').reset();
+  document.getElementById('quizResult').style.display = 'none';
+  document.getElementById('quizForm').style.display = 'block';
+  document.getElementById('submitQuizBtn').style.display = 'inline-block';
+});
+
+// Submit quiz
+document.getElementById('submitQuizBtn').addEventListener('click', async () => {
+  const form = document.getElementById('quizForm');
+  const activityId = form.dataset.activityId;
+  
+  // Get all unique questions and answered questions
+  const allQuestions = new Set();
+  const answeredQuestions = new Set();
+  const answers = {};
+  
+  form.querySelectorAll('input[type=radio]').forEach(input => {
+    allQuestions.add(input.name);
+  });
+  
+  form.querySelectorAll('input[type=radio]:checked').forEach(input => {
+    answeredQuestions.add(input.name);
+    answers[input.name] = input.value;
+  });
+  
+  // Validate all questions answered
+  if (allQuestions.size !== answeredQuestions.size) {
+    alert(`Please answer all ${allQuestions.size} questions before submitting.`);
+    return;
+  }
+  
+  // Submit quiz
+  const res = await fetch('/api/quiz/submit', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({activityId, answers})
+  });
+  
+  const result = await res.json();
+  
+  if (res.ok) {
+    const score = result.result.score;
+    const total = result.result.total;
+    const status = score >= 70 ? '✅ PASSED - Congratulations!' : '❌ Need to Retry';
+    const statusColor = score >= 70 ? '#10b981' : '#ef4444';
+    
+    document.getElementById('quizResult').innerHTML = `
+      <div style="background:#f0fdf4;padding:16px;border-radius:8px;border:2px solid ${statusColor};text-align:center">
+        <div style="font-size:20px;font-weight:bold;color:${statusColor};margin-bottom:8px">${status}</div>
+        <div style="font-size:28px;font-weight:bold;color:#7c3aed">Score: ${score}%</div>
+        <div style="font-size:14px;color:#666;margin-top:8px">${total} questions</div>
+        ${score >= 70 ? '<div style="margin-top:12px;font-size:14px;color:#10b981">✓ Activity completed!</div>' : '<div style="margin-top:12px;font-size:14px;color:#ef4444">Try again to score 70% or above</div>'}
+      </div>
+    `;
+    document.getElementById('quizResult').style.display = 'block';
+    document.getElementById('quizForm').style.display = 'none';
+    document.getElementById('submitQuizBtn').style.display = 'none';
+    
+    // Close modal and refresh after 2.5 seconds
+    setTimeout(() => {
+      document.getElementById('quizModal').style.display = 'none';
+      document.getElementById('quizForm').reset();
+      document.getElementById('quizResult').style.display = 'none';
+      document.getElementById('quizForm').style.display = 'block';
+      document.getElementById('submitQuizBtn').style.display = 'inline-block';
+      loadActivities();
+    }, 2500);
+  } else {
+    alert('Error submitting quiz: ' + (result.error || 'Unknown error'));
+  }
+});
+
+document.getElementById('profile-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('name').value.trim();
+  const currentRole = document.getElementById('currentRole').value.trim();
+  const targetRole = document.getElementById('targetRole').value.trim();
+  const terms = document.getElementById('terms').checked;
+  const err = document.getElementById('profile-error');
+  err.textContent = '';
+  if (!name) { err.textContent = 'Please enter your full name.'; return; }
+  if (!targetRole) { err.textContent = 'Please enter a target role or profession.'; return; }
+  if (!terms) { err.textContent = 'You must agree to the Terms & Conditions.'; return; }
+
+  // Don't send userId - let backend use session user_id
+  const payload = { profile: { fullName: name, currentRole, targetRole } };
+  const res = await fetch('/api/profile', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+  const data = await res.json();
+  if (data && data.userId) {
+    // Show activities section and load activities for this role
+    document.getElementById('activities-section').style.display = 'block';
+    await loadActivities();
+    // Scroll to activities
+    document.getElementById('activities-section').scrollIntoView({ behavior: 'smooth' });
+  }
+});
+
+// On page load, prefill profile + show activities/progress if user already saved a profile
+document.addEventListener('DOMContentLoaded', async () => {
+  await hydrateHomeFromServer();
+});
+
+document.getElementById('generateBtn').addEventListener('click', async () => {
+  const goal = document.getElementById('goalInput').value.trim() || document.getElementById('targetRole').value.trim() || 'Software Engineer';
+  const format = document.getElementById('formatSelect').value;
+  const profile = { fullName: document.getElementById('name').value.trim(), currentRole: document.getElementById('currentRole').value.trim(), targetRole: document.getElementById('targetRole').value.trim() };
+  const container = document.getElementById('roadmapContainer');
+  container.innerHTML = '<div class="roadmap-message roadmap-loading">Generating your roadmap...</div>';
+  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  try {
+    // Don't send userId - backend uses session user_id from @login_required
+    const res = await fetch('/api/generate-roadmap', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ goal, context: { profile }, format }) });
+    if (!res.ok) {
+      throw new Error('Failed to generate roadmap. Please try again.');
+    }
+    const json = await res.json();
+    const roadmap = json && json.roadmap ? json.roadmap : null;
+    if (!roadmap || !Array.isArray(roadmap.steps) || !roadmap.steps.length) {
+      throw new Error('No roadmap steps returned. Please try a different goal.');
+    }
+
+    container.innerHTML = '';
+    // Build split panes
+    const split = document.createElement('div'); split.className = 'roadmap-split';
+    const left = document.createElement('div'); left.className = 'roadmap-pane';
+    const right = document.createElement('div'); right.className = 'roadmap-pane';
+    left.innerHTML = '<h3>Textual / Graphical</h3>';
+    const ol = document.createElement('ol');
+    (roadmap.steps || []).forEach(s => { const li = document.createElement('li'); li.innerHTML = '<strong>'+s.title+'</strong>: '+s.description; ol.appendChild(li); });
+    left.appendChild(ol);
+    right.innerHTML = '<h3>Code Format</h3><pre class="code"># Roadmap: '+(roadmap.goal || goal)+'\n'+((roadmap.steps||[]).map(s => `- ${s.title}: ${s.description}`).join('\n'))+'</pre>';
+    if (format === 'text') right.style.display = 'none';
+    if (format === 'code') left.style.display = 'none';
+    split.appendChild(left); split.appendChild(right); container.appendChild(split);
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (err) {
+    const msg = err && err.message ? err.message : 'Unable to generate roadmap right now.';
+    container.innerHTML = `<div class="roadmap-message roadmap-error">${msg}</div>`;
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+});
+
+document.getElementById('sendChat').addEventListener('click', async () => {
+  const msg = document.getElementById('chatInput').value;
+  if (!msg) return;
+  const chatWindow = document.getElementById('chat');
+  chatWindow.innerHTML += '<div class="bubble me">' + msg + '</div>';
+  // Don't send userId - backend uses session user_id
+  const res = await fetch('/api/chat', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ message: msg }) });
+  const json = await res.json();
+  chatWindow.innerHTML += '<div class="bubble bot">' + (json.reply || '') + '</div>';
+  document.getElementById('chatInput').value = '';
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+});
+    </script>
+  </body>
+</html>

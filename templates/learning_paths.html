@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Learning Paths - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="/static/dark-mode.js" defer></script>
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <img src="/static/images/logo.svg" alt="logo" class="logo" />
+            <h1>Virtual Career Counselor</h1>
+        </div>
+        <nav class="nav">
+            <a class="btn-soft" href="/">🏠 Home</a>
+            <a class="btn-soft" href="/dashboard">📊 Dashboard</a>
+            <a class="btn-soft" href="/logout">🚪 Logout</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>📚 Learning Paths</h2>
+            <p>Structured learning tracks with milestones and certificates</p>
+
+            <button class="btn-soft" id="createPathBtn">+ Create New Learning Path</button>
+
+            <div id="createPathForm" style="display:none" class="path-form">
+                <h3>Create Learning Path</h3>
+                <form id="pathForm">
+                    <div class="form-group-enhanced">
+                        <label>Career Field</label>
+                        <input type="text" id="pathCareer" class="form-input-enhanced" placeholder="e.g., Software Engineer" required />
+                    </div>
+                    <div id="milestonesContainer"></div>
+                    <button type="button" class="btn-soft" id="addMilestoneBtn">+ Add Milestone</button>
+                    <button type="submit" class="submit-button-enhanced">Create Path</button>
+                    <button type="button" class="btn-soft" onclick="document.getElementById('createPathForm').style.display='none'">Cancel</button>
+                </form>
+            </div>
+
+            <div id="pathsList" class="paths-list"></div>
+        </div>
+    </div>
+
+    <script>
+        let milestoneCount = 0;
+
+        document.getElementById('createPathBtn').addEventListener('click', () => {
+            document.getElementById('createPathForm').style.display = 'block';
+        });
+
+        document.getElementById('addMilestoneBtn').addEventListener('click', () => {
+            milestoneCount++;
+            const container = document.getElementById('milestonesContainer');
+            const milestone = document.createElement('div');
+            milestone.className = 'milestone-entry';
+            milestone.innerHTML = `
+                <h4>Milestone ${milestoneCount}</h4>
+                <input type="text" placeholder="Milestone Title" class="form-input-enhanced" required />
+                <textarea placeholder="Description" class="form-input-enhanced" rows="2" required></textarea>
+                <input type="text" placeholder="Estimated Duration (e.g., 2 weeks)" class="form-input-enhanced" />
+                <button type="button" class="remove-btn" onclick="this.parentElement.remove()">×</button>
+            `;
+            container.appendChild(milestone);
+        });
+
+        document.getElementById('pathForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const milestones = Array.from(document.querySelectorAll('.milestone-entry')).map((m, idx) => ({
+                index: idx,
+                title: m.children[1].value,
+                description: m.children[2].value,
+                duration: m.children[3].value,
+                completed: false
+            }));
+
+            const res = await fetch('/api/learning-paths', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    careerField: document.getElementById('pathCareer').value,
+                    milestones
+                })
+            });
+
+            if (res.ok) {
+                alert('Learning path created!');
+                document.getElementById('createPathForm').style.display = 'none';
+                document.getElementById('pathForm').reset();
+                document.getElementById('milestonesContainer').innerHTML = '';
+                milestoneCount = 0;
+                loadPaths();
+            }
+        });
+
+        async function loadPaths() {
+            const res = await fetch('/api/learning-paths');
+            if (res.ok) {
+                const data = await res.json();
+                const paths = data.paths || [];
+                const container = document.getElementById('pathsList');
+                
+                if (paths.length === 0) {
+                    container.innerHTML = '<p class="muted">No learning paths yet. Create one to get started!</p>';
+                } else {
+                    container.innerHTML = paths.map(path => `
+                        <div class="path-card">
+                            <div class="path-header">
+                                <h3>${path.careerField}</h3>
+                                <div class="path-progress">
+                                    <div class="progress-bar" style="width: ${path.progress || 0}%"></div>
+                                    <span>${path.progress || 0}% Complete</span>
+                                </div>
+                            </div>
+                            <div class="milestones-list">
+                                ${(path.milestones || []).map((m, idx) => `
+                                    <div class="milestone-item ${m.completed ? 'completed' : ''}">
+                                        <div class="milestone-checkbox">
+                                            ${m.completed ? '✅' : '⭕'}
+                                        </div>
+                                        <div class="milestone-content">
+                                            <h4>${m.title}</h4>
+                                            <p>${m.description}</p>
+                                            ${m.duration ? `<small>Duration: ${m.duration}</small>` : ''}
+                                        </div>
+                                        ${!m.completed ? `
+                                            <button class="btn-soft" onclick="completeMilestone('${path.pathId}', ${idx})">Mark Complete</button>
+                                        ` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+        }
+
+        window.completeMilestone = async (pathId, milestoneIndex) => {
+            const res = await fetch(`/api/learning-paths/${pathId}/complete-milestone`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({milestoneIndex})
+            });
+
+            if (res.ok) {
+                loadPaths();
+            }
+        };
+
+        loadPaths();
+    </script>
+</body>
+</html>

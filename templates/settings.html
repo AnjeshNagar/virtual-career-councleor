@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Settings - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <img src="/static/images/logo.svg" alt="logo" class="logo" />
+        <h1>Virtual Career Counselor</h1>
+      </div>
+      <nav class="nav">
+        <a class="btn-soft" href="/">🏠 Home</a>
+        <a class="btn-soft" href="/dashboard">📊 Dashboard</a>
+        <a class="btn-soft" href="/career-explore">🔍 Explore</a>
+        <a class="btn-soft" href="/courses">📚 Courses</a>
+        <a class="btn-soft" href="/job-insights">💼 Jobs</a>
+        <a class="btn-soft" href="/profile">👤 Profile</a>
+        <a class="btn-soft" href="/resume-builder">📄 Resume</a>
+        <a class="btn-soft" href="/interview-prep">🎤 Interview</a>
+        <a class="btn-soft" href="/career-match">🎯 Match</a>
+        <a class="btn-soft" href="/analytics">📊 Analytics</a>
+        <a class="btn-soft" href="/saved-jobs">🔖 Saved</a>
+        <a class="btn-soft" href="/settings">⚙️ Settings</a>
+        <details class="nav-more">
+          <summary class="btn-soft">✨ More</summary>
+          <div class="nav-more-menu">
+            <a class="btn-soft" href="/salary-negotiation">💰 Salary</a>
+            <a class="btn-soft" href="/company-insights">🏢 Companies</a>
+            <a class="btn-soft" href="/mentors">👥 Mentors</a>
+            <a class="btn-soft" href="/forum">💬 Forum</a>
+            <a class="btn-soft" href="/learning-paths">📚 Paths</a>
+            <a class="btn-soft" href="/referrals">🤝 Refer</a>
+            <a class="btn-soft" href="/connections">🤝 Connections</a>
+            <a class="btn-soft" href="/leaderboard">🏆 Leaderboard</a>
+          </div>
+        </details>
+        <a class="btn-soft" href="/logout">🚪 Logout</a>
+      </nav>
+    </header>
+
+    <div class="container">
+      <section class="card">
+        <h2>⚙️ Settings</h2>
+        <p class="muted">Basic preferences for your account and experience.</p>
+
+        <div class="form-section">
+          <h3>Language</h3>
+          <p class="muted">Multi-language UI requires full translations across the app, chat, quizzes, and roadmap content.</p>
+          <label class="form-label-enhanced">
+            <span class="label-icon">🌐</span>
+            <span class="label-text">Choose language</span>
+          </label>
+          <select id="languageSelect" class="form-select-enhanced">
+            <option value="en">English (Default)</option>
+            <option value="hi">Hindi (UI only – coming soon)</option>
+            <option value="ur">Urdu (UI only – coming soon)</option>
+            <option value="bn">Bengali (UI only – coming soon)</option>
+            <option value="ta">Tamil (UI only – coming soon)</option>
+            <option value="te">Telugu (UI only – coming soon)</option>
+            <option value="mr">Marathi (UI only – coming soon)</option>
+            <option value="gu">Gujarati (UI only – coming soon)</option>
+            <option value="kn">Kannada (UI only – coming soon)</option>
+            <option value="ml">Malayalam (UI only – coming soon)</option>
+            <option value="pa">Punjabi (UI only – coming soon)</option>
+          </select>
+          <div id="languageNote" class="muted" style="margin-top:8px">
+            Currently, the app content is fully available in English.
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Theme</h3>
+          <label class="checkbox-label-enhanced">
+            <input type="checkbox" id="darkModeToggle" class="checkbox-enhanced" />
+            <span>Enable dark mode</span>
+          </label>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const languageSelect = document.getElementById('languageSelect');
+      const languageNote = document.getElementById('languageNote');
+      const darkModeToggle = document.getElementById('darkModeToggle');
+
+      const savedLang = localStorage.getItem('vcc_lang') || 'en';
+      languageSelect.value = savedLang;
+
+      const savedTheme = localStorage.getItem('vcc_theme') || 'light';
+      darkModeToggle.checked = savedTheme === 'dark';
+      if (darkModeToggle.checked) {
+        document.body.classList.add('dark-mode');
+      }
+
+      languageSelect.addEventListener('change', () => {
+        const val = languageSelect.value;
+        localStorage.setItem('vcc_lang', val);
+        if (val !== 'en') {
+          languageNote.textContent = 'Selected language saved. Full translations are coming soon.';
+        } else {
+          languageNote.textContent = 'Currently, the app content is fully available in English.';
+        }
+      });
+
+      darkModeToggle.addEventListener('change', () => {
+        const isDark = darkModeToggle.checked;
+        localStorage.setItem('vcc_theme', isDark ? 'dark' : 'light');
+        document.body.classList.toggle('dark-mode', isDark);
+      });
+    </script>
+  </body>
+</html>

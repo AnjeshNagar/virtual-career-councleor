@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Dashboard - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body class="homepage-body">
+    <div class="homepage-bg-animation">
+      <div class="bg-orb orb-1"></div>
+      <div class="bg-orb orb-2"></div>
+      <div class="bg-orb orb-3"></div>
+      <div class="bg-orb orb-4"></div>
+    </div>
+
+    <header class="topbar enhanced-topbar">
+      <div class="brand">
+        <div class="logo-wrapper">
+          <img src="/static/images/logo.svg" alt="logo" class="logo" />
+        </div>
+        <h1>Admin Dashboard</h1>
+      </div>
+      <nav class="nav">
+        <a class="btn-soft" href="/admin/dashboard">📊 Dashboard</a>
+        <a class="btn-soft" href="/admin/jobs">💼 Jobs</a>
+        <a class="btn-soft" href="/admin/applications">📝 Applications</a>
+        <a class="btn-soft" href="/admin/logout">🚪 Logout</a>
+      </nav>
+    </header>
+
+    <div class="container homepage-container">
+      <section class="card enhanced-card">
+        <div class="section-header">
+          <div class="section-icon">👋</div>
+          <h2 class="section-title">Welcome, {{ admin.name or 'Admin' }}!</h2>
+          <p class="section-subtitle">Manage job postings and applications</p>
+        </div>
+
+        <div class="dashboard-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 2rem 0;">
+          <div class="stat-card" style="padding: 1.5rem; background: rgba(76, 175, 80, 0.1); border-radius: 12px; text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">💼</div>
+            <div style="font-size: 2rem; font-weight: bold;">{{ jobs|length }}</div>
+            <div style="color: #666;">Active Jobs</div>
+          </div>
+          <div class="stat-card" style="padding: 1.5rem; background: rgba(33, 150, 243, 0.1); border-radius: 12px; text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📝</div>
+            <div style="font-size: 2rem; font-weight: bold;">{{ applications|length }}</div>
+            <div style="color: #666;">Total Applications</div>
+          </div>
+          <div class="stat-card" style="padding: 1.5rem; background: rgba(255, 152, 0, 0.1); border-radius: 12px; text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">⏳</div>
+            <div style="font-size: 2rem; font-weight: bold;">{{ applications|selectattr('status', 'equalto', 'pending')|list|length }}</div>
+            <div style="color: #666;">Pending Reviews</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 2rem;">
+          <h3 style="margin-bottom: 1rem;">Quick Actions</h3>
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <a href="/admin/jobs" class="generate-button-enhanced">
+              <span class="button-icon">➕</span>
+              <span class="button-text">Post New Job</span>
+            </a>
+            <a href="/admin/applications" class="generate-button-enhanced">
+              <span class="button-icon">📋</span>
+              <span class="button-text">View Applications</span>
+            </a>
+          </div>
+        </div>
+
+        {% if applications|length > 0 %}
+        <div style="margin-top: 2rem;">
+          <h3 style="margin-bottom: 1rem;">Recent Applications</h3>
+          <div class="applications-preview">
+            {% for app in applications[:5] %}
+            <div style="padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px; margin-bottom: 0.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <strong>{{ app.fullName }}</strong> applied for a position
+                  <span style="color: #666; font-size: 0.9rem;">{{ app.createdAt[:10] }}</span>
+                </div>
+                <span style="padding: 0.25rem 0.75rem; border-radius: 12px; background: {% if app.status == 'pending' %}rgba(255, 152, 0, 0.2){% elif app.status == 'accepted' %}rgba(76, 175, 80, 0.2){% else %}rgba(244, 67, 54, 0.2){% endif %};">
+                  {{ app.status|title }}
+                </span>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          <a href="/admin/applications" style="display: inline-block; margin-top: 1rem;">View All Applications →</a>
+        </div>
+        {% endif %}
+      </section>
+    </div>
+  </body>
+</html>

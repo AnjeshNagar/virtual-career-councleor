@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Career Path Exploration - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="/static/navbar.js" defer></script>
+  </head>
+  <body class="homepage-body">
+    <div class="homepage-bg-animation">
+      <div class="bg-orb orb-1"></div>
+      <div class="bg-orb orb-2"></div>
+      <div class="bg-orb orb-3"></div>
+      <div class="bg-orb orb-4"></div>
+    </div>
+
+    <header class="topbar enhanced-topbar">
+      <div class="brand">
+        <div class="logo-wrapper">
+          <img src="/static/images/logo.svg" alt="logo" class="logo" />
+        </div>
+        <h1>Virtual Career Counselor</h1>
+      </div>
+      
+      <!-- Mobile Menu Toggle -->
+      <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="nav" id="mainNav">
+        <a class="nav-link" href="/">🏠 Home</a>
+        <a class="nav-link" href="/dashboard">📊 Dashboard</a>
+        
+        <!-- Career Development Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">🚀 Career</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/career-explore">🔍 Explore Careers</a>
+            <a class="dropdown-item" href="/career-match">🎯 Career Match</a>
+            <a class="dropdown-item" href="/learning-paths">📚 Learning Paths</a>
+            <a class="dropdown-item" href="/analytics">📊 Career Analytics</a>
+          </div>
+        </div>
+
+        <!-- Learning & Skills Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">📚 Learning</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/courses">📖 Courses</a>
+            <a class="dropdown-item" href="/resume-builder">📄 Resume Builder</a>
+            <a class="dropdown-item" href="/interview-prep">🎤 Interview Prep</a>
+            <a class="dropdown-item" href="/salary-negotiation">💰 Salary Negotiation</a>
+          </div>
+        </div>
+
+        <!-- Jobs & Network Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">💼 Jobs</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/job-insights">🔍 Job Insights</a>
+            <a class="dropdown-item" href="/saved-jobs">🔖 Saved Jobs</a>
+            <a class="dropdown-item" href="/company-insights">🏢 Companies</a>
+            <a class="dropdown-item" href="/referrals">🤝 Referrals</a>
+          </div>
+        </div>
+
+        <!-- Community Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">👥 Community</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/mentors">👨‍🏫 Mentors</a>
+            <a class="dropdown-item" href="/forum">💬 Forum</a>
+            <a class="dropdown-item" href="/connections">🤝 Connections</a>
+            <a class="dropdown-item" href="/leaderboard">🏆 Leaderboard</a>
+          </div>
+        </div>
+
+        <!-- Profile & Settings -->
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">👤 Account</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/profile">👤 Profile</a>
+            <a class="dropdown-item" href="/settings">⚙️ Settings</a>
+            <a class="dropdown-item" href="/logout">🚪 Logout</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <div class="container homepage-container">
+      <section class="card enhanced-card">
+        <div class="section-header">
+          <div class="section-icon">🔍</div>
+          <h2 class="section-title">Career Path Exploration</h2>
+          <p class="section-subtitle">Discover comprehensive information about any career path</p>
+        </div>
+
+        <div class="career-search-wrapper">
+          <div class="form-group-enhanced">
+            <label class="form-label-enhanced">
+              <span class="label-icon">💼</span>
+              <span class="label-text">Enter Career/Profession Name</span>
+            </label>
+            <input id="careerInput" type="text" class="form-input-enhanced" placeholder="e.g., Software Engineer, Data Analyst, Teacher, Doctor" />
+          </div>
+          <button id="exploreBtn" class="generate-button-enhanced">
+            <span class="button-icon">✨</span>
+            <span class="button-text">Explore Career Path</span>
+            <span class="button-arrow">→</span>
+          </button>
+        </div>
+
+        <div id="careerResults" class="career-results-container" style="display:none">
+          <!-- Results will be populated here -->
+        </div>
+      </section>
+    </div>
+
+    <script>
+      document.getElementById('exploreBtn').addEventListener('click', async () => {
+        const career = document.getElementById('careerInput').value.trim();
+        if (!career) {
+          alert('Please enter a career name');
+          return;
+        }
+
+        const btn = document.getElementById('exploreBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="button-icon">⏳</span><span class="button-text">Exploring...</span>';
+
+        try {
+          const res = await fetch('/api/career-explore', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({career})
+          });
+
+          const data = await res.json();
+          if (res.ok && data.career_data) {
+            displayCareerData(data.career_data);
+          } else {
+            alert('Error: ' + (data.error || 'Failed to fetch career data'));
+          }
+        } catch (error) {
+          alert('Error: ' + error.message);
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<span class="button-icon">✨</span><span class="button-text">Explore Career Path</span><span class="button-arrow">→</span>';
+        }
+      });
+
+      function displayCareerData(data) {
+        const container = document.getElementById('careerResults');
+        container.style.display = 'block';
+        
+        container.innerHTML = `
+          <div class="career-overview-section">
+            <h3>📋 Career Overview</h3>
+            <p class="career-overview-text">${data.overview || 'No overview available'}</p>
+          </div>
+
+          <div class="career-section">
+            <h3>🛠️ Required Skills</h3>
+            <div class="skills-grid">
+              ${(data.required_skills || []).map(skill => `<div class="skill-badge">${skill}</div>`).join('')}
+            </div>
+          </div>
+
+          <div class="career-section">
+            <h3>📚 Recommended Courses</h3>
+            <div class="courses-list">
+              ${(data.recommended_courses || []).map(course => `
+                <div class="course-card">
+                  <div class="course-header">
+                    <h4>${course.name || 'Course Name'}</h4>
+                    <span class="course-platform">${course.platform || 'Platform'}</span>
+                  </div>
+                  <p class="course-description">${course.description || ''}</p>
+                  <div class="course-meta">
+                    <span class="course-duration">⏱️ ${course.duration || 'N/A'}</span>
+                    <span class="course-level">📊 ${course.level || 'N/A'}</span>
+                    ${course.rating ? `<span class="course-rating">⭐ ${course.rating}</span>` : ''}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="career-section">
+            <h3>🏆 Certifications</h3>
+            <div class="certifications-list">
+              ${(data.certifications || []).map(cert => `
+                <div class="cert-card">
+                  <h4>${cert.name || 'Certification'}</h4>
+                  <p class="cert-issuer">Issued by: ${cert.issuer || 'N/A'}</p>
+                  <p class="cert-description">${cert.description || ''}</p>
+                  <span class="cert-validity">Valid: ${cert.validity || 'N/A'}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="career-section">
+            <h3>📝 Required Exams</h3>
+            <div class="exams-list">
+              ${(data.exams || []).map(exam => `
+                <div class="exam-card">
+                  <h4>${exam.name || 'Exam Name'}</h4>
+                  <p class="exam-description">${exam.description || ''}</p>
+                  <div class="exam-meta">
+                    <span>📋 Format: ${exam.format || 'N/A'}</span>
+                    <span>⏰ Prep Time: ${exam.preparation_time || 'N/A'}</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="career-section">
+            <h3>💼 Job Roles</h3>
+            <div class="roles-list">
+              ${(data.job_roles || []).map(role => `
+                <div class="role-card">
+                  <h4>${role.title || 'Job Title'}</h4>
+                  <p class="role-description">${role.description || ''}</p>
+                  <span class="role-level">Level: ${role.experience_level || 'N/A'}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="career-section">
+            <h3>💰 Salary Range</h3>
+            <div class="salary-info">
+              <div class="salary-item">
+                <span class="salary-level">Entry Level:</span>
+                <span class="salary-amount">${data.salary_range?.entry || 'N/A'}</span>
+              </div>
+              <div class="salary-item">
+                <span class="salary-level">Mid Level:</span>
+                <span class="salary-amount">${data.salary_range?.mid || 'N/A'}</span>
+              </div>
+              <div class="salary-item">
+                <span class="salary-level">Senior Level:</span>
+                <span class="salary-amount">${data.salary_range?.senior || 'N/A'}</span>
+              </div>
+            </div>
+          </div>
+
+          ${data.growth_outlook ? `
+            <div class="career-section">
+              <h3>📈 Growth Outlook</h3>
+              <p class="growth-text">${data.growth_outlook}</p>
+            </div>
+          ` : ''}
+        `;
+
+        container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      // Allow Enter key to trigger search
+      document.getElementById('careerInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          document.getElementById('exploreBtn').click();
+        }
+      });
+    </script>
+  </body>
+</html>

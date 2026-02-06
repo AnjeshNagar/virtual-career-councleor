@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Quiz - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <img src="/static/images/logo.svg" alt="logo" class="logo" />
+        <h1>Quiz</h1>
+      </div>
+      <nav class="nav">
+        <a class="btn-soft" href="/" target="_self">Home</a>
+      </nav>
+    </header>
+    <div class="container card">
+      <div style="background:#eef2ff;padding:12px;border-radius:8px;margin-bottom:12px">
+        <p class="muted"><strong>{{ activity.title }}</strong> — Level: <span style="color:#7c3aed">{{ activity.level|title }}</span> — Profession: <span style="color:#10b981">{{ activity.role|title }}</span></p>
+      </div>
+      <h2>{{ quiz.title }}</h2>
+      <p class="muted">Answer the following questions related to <strong>{{ activity.role|title }}</strong>. Score 70% or above to complete this activity.</p>
+      <form id="quizForm">
+        <input type="hidden" name="activityId" value="{{ activity.activityId }}" />
+        <div id="questions">
+          {% for q in quiz.questions %}
+            <div class="question" data-qid="{{ q.id }}" style="margin-bottom:20px;padding:12px;background:#fbfdff;border-radius:8px;border-left:4px solid #7c3aed">
+              <p><strong>Question {{ loop.index }}: {{ q.text }}</strong></p>
+              {% for cidx, choice in enumerate(q.choices) %}
+                <label style="display:block;margin:8px 0"><input type="radio" name="{{ q.id }}" value="{{ cidx }}" required> {{ choice }}</label>
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+        <button type="button" id="submitBtn" style="margin-top:12px">Submit Quiz</button>
+      </form>
+      <div id="result" class="muted" style="margin-top:12px"></div>
+    </div>
+
+    <script>
+      document.getElementById('submitBtn').onclick = async ()=>{
+        const form = document.getElementById('quizForm');
+        const activityId = form.activityId.value;
+        const inputs = form.querySelectorAll('input[type=radio]:checked');
+        const answers = {};
+        inputs.forEach(i=>{ answers[i.name]=i.value });
+        
+        // Check all questions are answered
+        const allInputs = form.querySelectorAll('input[type=radio]');
+        const questions = {};
+        allInputs.forEach(i=>{ questions[i.name]=true });
+        if(Object.keys(answers).length !== Object.keys(questions).length){
+          alert('Please answer all questions before submitting.');
+          return;
+        }
+        
+        const resp = await fetch('/api/quiz/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({activityId,answers})});
+        const data = await resp.json();
+        if(resp.ok){
+          const resultDiv = document.getElementById('result');
+          const score = data.result.score;
+          const status = score >= 70 ? '✅ PASSED' : '❌ Need to retry';
+          resultDiv.innerHTML = `<strong style="font-size:18px">${status}</strong><br/>Score: <strong style="color:#7c3aed;font-size:24px">${score}%</strong> (${data.result.total} questions)<br/><em>Redirecting to home in 2 seconds...</em>`;
+          setTimeout(()=>window.location.href='/',2000);
+        } else {
+          document.getElementById('result').textContent = data.error || 'Submission failed';
+        }
+      }
+    </script>
+  </body>
+</html>

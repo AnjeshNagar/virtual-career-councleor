@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign up - VCC</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Sign up</h1>
+      
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-messages">
+            {% for category, message in messages %}
+              <div class="flash-message flash-{{ category }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      
+      <form method="post">
+        <label>Full name<br /><input name="fullName" required /></label>
+        <label>Email<br /><input name="email" type="email" required /></label>
+        <label>Password<br /><input name="password" type="password" required /></label>
+        <label>Phone<br /><input name="phone" /></label>
+        <label>School / College<br /><input name="school" /></label>
+        <label>Organization<br /><input name="organization" /></label>
+        <label>Address<br /><input name="address" /></label>
+        <label>Are you a student or professional?<br />
+          <select name="role"><option>Student</option><option>Professional</option></select>
+        </label>
+        <label>Referral Code (Optional)<br />
+          <input name="referralCode" placeholder="Enter referral code if you have one" />
+          <small style="color: #6b7280; display: block; margin-top: 0.25rem;">Get bonus XP when you sign up with a referral code!</small>
+        </label>
+        <button type="submit">Create account</button>
+      </form>
+      <p><a href="/login">Already have an account? Login</a></p>
+    </div>
+    <script>
+      // Clear localStorage when visiting signup page to ensure clean session
+      localStorage.removeItem('vcc_user');
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('vcc_')) {
+          localStorage.removeItem(key);
+        }
+      });
+    </script>
+  </body>
+</html>
