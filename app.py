@@ -33,6 +33,8 @@ app.secret_key = os.environ.get('FLASK_SECRET', 'dev-secret')
 aws = AwsClient()
 
 
+# SNS Topic ARN (for development/testing)
+SNS_TOPIC_ARN = os.environ.get('SNS_TOPIC_ARN', 'arn:aws:sns:us-east-1:arn:aws:sns:us-east-1:600627341644:aws_sns:144de1b9-ca46-46ef-a93a-a39d43525da9:VCC_Notifications')
 
 
 
@@ -2565,4 +2567,5 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
 
     app.run(host='0.0.0.0', port=port, debug=True)
+
 
